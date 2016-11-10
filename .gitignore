@@ -1,0 +1,7 @@
+*.zip
+.idea/
+*.class
+*.log
+*.hlt
+*.swp
+bin/
