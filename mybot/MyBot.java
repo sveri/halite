@@ -9,10 +9,15 @@ import java.util.List;
  */
 public class MyBot {
 
+    static Logger logger;
+    static boolean logNow = false;
+
+    static int frame = 0;
+
     private static final String botName = "sveriBot";
 
     public static void main(String[] args) throws IOException {
-        final Logger logger = new Logger(botName);
+        logger = new Logger(botName);
         addShutdownHook(logger);
 
         InitPackage iPackage = Networking.getInit();
@@ -25,6 +30,7 @@ public class MyBot {
         Networking.sendInit(botName);
 
         while (true) {
+            logger.info("Frame: " + frame);
             ArrayList<Move> moves = new ArrayList<>();
 
             gameMap = Networking.getFrame();
@@ -43,10 +49,9 @@ public class MyBot {
                         Piece shouldMovePiece = shouldMove(curPiece, neighbors, myID);
 
                         if (shouldMovePiece != null) {
-                            logger.info(curPiece.toString());
-//                            logger.info(weakestNeigbhor.toString());
-//                            logger.info(curPiece.getDirectionTo(weakestNeigbhor.getLoc()).toString());
-                            moves.add(new Move(curLoc, curPiece.getDirectionTo(shouldMovePiece.getLoc())));
+                            Direction directionTo = curPiece.getDirectionTo(shouldMovePiece.getLoc(), myID);
+                            if(gameMap.getSite(curLoc, directionTo).strength + curPiece.getStrength() < 400)
+                                moves.add(new Move(curLoc, directionTo));
                         } else {
                             moves.add(new Move(curLoc, Direction.STILL));
                         }
@@ -55,38 +60,28 @@ public class MyBot {
             }
 
             Networking.sendFrame(moves);
+            frame++;
         }
     }
 
     private static Piece shouldMove(Piece curPiece, List<Piece> neighbors, int myID) {
 
-        if (curPiece.getProduction() > 5 && curPiece.getStrength() < 240) return null;
+        if (curPiece.getProduction() == 6 && curPiece.getStrength() < 250) return null;
+
 
         Piece weakestEnemyNeighbor = Piece.getWeakestEnemyNeighbor(neighbors, myID);
-        if (weakestEnemyNeighbor != null && weakestEnemyNeighbor.getSite().strength < curPiece.getStrength())
+        if (weakestEnemyNeighbor != null && weakestEnemyNeighbor.getStrength() < curPiece.getStrength()) {
             return weakestEnemyNeighbor;
-
-//        Piece weakestOwnNeighbor = Piece.getWeakestOwnNeighbor(neighbors, myID);
+        }
 
         if(curPiece.getStrength() > 100)
             return curPiece.findPieceInNextEnemyDirection(myID);
-
-//        if (weakestOwnNeighbor != null && weakestOwnNeighbor.getSite().strength < curPiece.getStrength()
-//                && curPiece.getStrength() > 100 && weakestOwnNeighbor.getSite().strength > 10)
-//            return weakestOwnNeighbor;
 
 
         return null;
     }
 
-//    private static boolean shouldMove(Site curSite, Piece weakestNeigbhor, int myID) {
-//        if (curSite.production > 5 && curSite.strength < 200) return false;
-//        if (weakestNeigbhor != null && weakestNeigbhor.getSite().owner != myID) return true;
-//
-//        return false;
-//    }
-
-    private static void addShutdownHook(Logger logger) {
+    private static void addShutdownHook(final Logger logger) {
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override

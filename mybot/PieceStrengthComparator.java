@@ -1,6 +1,6 @@
 import java.util.Comparator;
 
-public class PieceStrengthComparator implements Comparator<Piece> {
+class PieceStrengthComparator implements Comparator<Piece> {
 
     @Override
     public int compare(Piece o1, Piece o2) {
