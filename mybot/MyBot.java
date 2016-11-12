@@ -35,6 +35,8 @@ public class MyBot {
 
             gameMap = Networking.getFrame();
 
+            GeneralGameInformation gameInformation = getGeneralGameInformation(gameMap, myID);
+
             for (int y = 0; y < gameMap.height; y++) {
                 for (int x = 0; x < gameMap.width; x++) {
                     Site curSite = gameMap.getSite(new Location(x, y));
@@ -46,7 +48,7 @@ public class MyBot {
 
                         List<Piece> neighbors = curPiece.getNeighbors();
 
-                        Piece shouldMovePiece = shouldMove(curPiece, neighbors, myID);
+                        Piece shouldMovePiece = shouldMove(curPiece, neighbors, myID, gameInformation);
 
                         if (shouldMovePiece != null) {
                             Direction directionTo = curPiece.getDirectionTo(shouldMovePiece.getLoc(), myID);
@@ -64,9 +66,25 @@ public class MyBot {
         }
     }
 
-    private static Piece shouldMove(Piece curPiece, List<Piece> neighbors, int myID) {
+    private static GeneralGameInformation getGeneralGameInformation(GameMap gameMap, int myID) {
+        GeneralGameInformation info = new GeneralGameInformation();
+        for (int y = 0; y < gameMap.height; y++) {
+            for (int x = 0; x < gameMap.width; x++) {
+                Site site = gameMap.getSite(new Location(x, y));
+                if(site.owner == 0) info.addOneToNpcTilesCount();
+                else if(site.owner == myID) info.addOneToOwnTilesCount();
+                else info.addOneToEnemyTilesCount();
+            }
 
-        if (curPiece.getProduction() == 6 && curPiece.getStrength() < 250) return null;
+        }
+
+        return info;
+    }
+
+    private static Piece shouldMove(Piece curPiece, List<Piece> neighbors, int myID, GeneralGameInformation gameInformation) {
+
+        if (curPiece.getProduction() == 6 && curPiece.getStrength() < 250 && gameInformation.getOwnTilesCount() > 10)
+            return null;
 
 
         Piece weakestEnemyNeighbor = Piece.getWeakestEnemyNeighbor(neighbors, myID);
@@ -75,7 +93,7 @@ public class MyBot {
         }
 
         if(curPiece.getStrength() > 100)
-            return curPiece.findPieceInNextEnemyDirection(myID);
+            return curPiece.findNextEnemyOrNPCPiece(myID);
 
 
         return null;

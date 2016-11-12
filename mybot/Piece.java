@@ -81,36 +81,29 @@ class Piece {
         return null;
     }
 
-    Piece findPieceInNextEnemyDirection(int myID) {
+    Piece findNextEnemyOrNPCPiece(int myID) {
         for (int i = 0; i < gameMap.height; i++) {
+            Adder add = new Adder(gameMap.width, gameMap.height);
 
-            int j = i;
-            if (loc.x + i >= gameMap.height) j = loc.x + i - gameMap.height;
-            Location newLoc = new Location(j, loc.y);
+            Location newLoc = new Location(add.addX(loc.x, i), loc.y);
             Site newSite = gameMap.getSite(newLoc);
             if (newSite.owner != myID) {
                 return new Piece(newLoc, newSite, gameMap);
             }
 
-            j = i;
-            if (loc.x - i < 0) j = gameMap.height + loc.x - i;
-            newLoc = new Location(j, loc.y);
+            newLoc = new Location(add.subX(loc.x, i), loc.y);
             newSite = gameMap.getSite(newLoc);
             if (newSite.owner != myID) {
                 return new Piece(newLoc, newSite, gameMap);
             }
 
-            j = i;
-            if (loc.y + i >= gameMap.width) j = loc.y + i - gameMap.width;
-            newLoc = new Location(loc.x, j);
+            newLoc = new Location(loc.x, add.addY(loc.y, i));
             newSite = gameMap.getSite(newLoc);
             if (newSite.owner != myID) {
                 return new Piece(newLoc, newSite, gameMap);
             }
 
-            j = i;
-            if (loc.y - i < 0) j = gameMap.width + loc.y - i;
-            newLoc = new Location(loc.x, j);
+            newLoc = new Location(loc.x, add.subY(loc.y, i));
             newSite = gameMap.getSite(newLoc);
             if (newSite.owner != myID) {
                 return new Piece(newLoc, newSite, gameMap);
