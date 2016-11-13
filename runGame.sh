@@ -12,8 +12,8 @@ cd fourthbot
 javac -d ../bin/fourthbot FourthBot.java
 cd ..
 
-cd fithbot
-javac -d ../bin/fithbot FithBot.java
+cd seventhbot
+javac -d ../bin/seventhbot MyBot.java
 cd ..
 
 cd mybot
@@ -22,7 +22,7 @@ cd ..
 
 
 #halite -d "20 20" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/fourthbot/ FourthBot"
-halite -d "25 25" "java -cp .:bin/sixthbot/ SixthBot" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/fithbot/ FithBot"
+halite -d "25 25" "java -cp .:bin/sixthbot/ SixthBot" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/seventhbot/ MyBot"
 
 
 

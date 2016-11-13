@@ -39,8 +39,6 @@ class Piece {
         return this.getSite().strength;
     }
 
-    int getProduction() {return this.getSite().production; }
-
     boolean hasNOtherNeigbhors(int myID, int expectedNeighborCount) {
         int neigbhorCount = 0;
         if (gameMap.getSite(loc, Direction.EAST).owner != myID) neigbhorCount++;
@@ -65,20 +63,12 @@ class Piece {
         if(siteNorth.owner != myID && siteNorth.strength < getStrength()) retDirection = Direction.NORTH;
 
         if(hasNOtherNeigbhors(myID, 0)) {
-            if(moveAccordingToOwnStrength() && siteEast.strength + getStrength() < 500) retDirection = Direction.EAST;
-            else if(moveAccordingToOwnStrength() && siteSouth.strength + getStrength() < 500) retDirection = Direction.SOUTH;
-            else if(moveAccordingToOwnStrength() && siteWest.strength + getStrength() < 500) retDirection = Direction.WEST;
-            else if(moveAccordingToOwnStrength() && siteNorth.strength + getStrength() < 500) retDirection = Direction.NORTH;
+            if(getStrength() > 100 && siteEast.strength + getStrength() < 500) retDirection = Direction.EAST;
+            else if(getStrength() > 100 && siteSouth.strength + getStrength() < 500) retDirection = Direction.SOUTH;
+            else if(getStrength() > 100 && siteWest.strength + getStrength() < 500) retDirection = Direction.WEST;
+            else if(getStrength() > 100 && siteNorth.strength + getStrength() < 500) retDirection = Direction.NORTH;
         }
 
         return retDirection;
     }
-
-    private boolean moveAccordingToOwnStrength() {
-        return (getProduction() == 1 &&  getStrength() > 40)
-                || (getProduction() == 2 &&  getStrength() > 70)
-                || (getProduction() == 3 &&  getStrength() > 100)
-                || (getProduction() == 4 &&  getStrength() > 180)
-                || (getProduction() == 5 &&  getStrength() > 200)
-                || (getProduction() >= 6 &&  getStrength() > 250);    }
 }
