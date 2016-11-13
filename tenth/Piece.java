@@ -132,7 +132,7 @@ class Piece {
 //    }
 //
 //    private boolean hasEnemyNeighborAt(Location loc, int myID, Direction direction) {
-//        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != MyBot.npcID;
+//        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != Tenth.npcID;
 //    }
 
     private boolean hasOnlyOwnNeighbors(int myID) {
