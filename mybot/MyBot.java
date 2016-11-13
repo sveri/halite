@@ -17,6 +17,8 @@ public class MyBot {
 
     private static GameMap gameMap = null;
 
+    static int npcID = 0;
+
     public static void main(String[] args) throws IOException {
         logger = new Logger(botName);
         addShutdownHook(logger);
@@ -41,7 +43,7 @@ public class MyBot {
             List<Piece> ownPiecesFromOuterToInner = gameInformation.getOwnPiecesFromOuterToInner(myID);
 
             for (Piece piece : ownPiecesFromOuterToInner) {
-                Direction direction = piece.getNextNonEnemyNonOwnDirectionThatItCanMoveTo(myID);
+                Direction direction = piece.getNextNonEnemyNonOwnDirectionThatItCanMoveTo(myID, gameInformation.getNpcs());
                 moves.add(new Move(piece.getLoc(), direction));
             }
 

@@ -4,12 +4,12 @@
 rm *.log
 rm *.hlt
 
+#cd standstillbot
+#javac -d ../bin/standstillbot StandstillBot.java
+#cd ..
+
 cd sixthbot
 javac -d ../bin/sixthbot SixthBot.java
-cd ..
-
-cd fourthbot
-javac -d ../bin/fourthbot FourthBot.java
 cd ..
 
 cd seventhbot
@@ -22,7 +22,7 @@ cd ..
 
 
 #halite -d "20 20" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/fourthbot/ FourthBot"
-halite -d "25 25" "java -cp .:bin/sixthbot/ SixthBot" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/seventhbot/ MyBot"
+halite -d "30 30" "java -cp .:bin/sixthbot/ SixthBot" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/seventhbot/ MyBot"
 
 
 
