@@ -114,4 +114,8 @@ public class GameMap{
     public Site getSite(Location loc) {
         return contents.get(loc.y).get(loc.x);
     }
+
+    public int getTotalPiecesCount(){
+        return height * width;
+    }
 }

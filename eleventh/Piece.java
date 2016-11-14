@@ -21,44 +21,26 @@ class Piece {
     }
 
     Direction findNextDirection(int myID, GeneralGameInformation gameInformation) {
-        int earlyGameDivider = gameMap.getTotalPiecesCount() / 30;
         Direction retDirection = Direction.STILL;
 
-        // early game until we have 10 pieces
-        if (gameInformation.getOwns().size() <= earlyGameDivider && !hasOnlyOwnNeighbors(myID)) {
-            Piece nextPiece = new NullPiece();
+        if (hasOnlyOwnNeighbors(myID)) {
+            List<Piece> npcsAndEnemies = new ArrayList<>();
+            npcsAndEnemies.addAll(gameInformation.getNpcs());
+            npcsAndEnemies.addAll(gameInformation.getEnemies());
+            Piece nextNpc = findClosestNonOwnPiece(npcsAndEnemies);
+            if (nextNpc != null && moveAccordingToOwnStrength()) {
+                retDirection = gameMap.getDirectionFromTo(loc, nextNpc.getLoc(), gameMap.height, gameMap.width);
+            }
+        } else {
             List<Piece> nonOwnNeighbors = getAllNonOwnNeighbors(myID);
+            int tempProd = -1;
+
             for (Piece nonOwnNeighbor : nonOwnNeighbors) {
-                if(nonOwnNeighbor.getProduction() > nextPiece.getProduction()) nextPiece = nonOwnNeighbor;
-            }
-            if (nextPiece.getProduction() > -1 && nextPiece.getStrength() < getStrength()) {
-                retDirection = gameMap.getDirectionFromTo(getLoc(), nextPiece.getLoc(), gameMap.height, gameMap.width);
-            }
-
-        }
-        //middle to late for now
-        else if (gameInformation.getOwns().size() > earlyGameDivider) {
-
-            if (hasOnlyOwnNeighbors(myID)) {
-                List<Piece> npcsAndEnemies = new ArrayList<>();
-                npcsAndEnemies.addAll(gameInformation.getNpcs());
-                npcsAndEnemies.addAll(gameInformation.getEnemies());
-                Piece nextNpc = findClosestNonOwnPiece(npcsAndEnemies);
-                if (nextNpc != null && moveAccordingToOwnStrength()) {
-                    retDirection = gameMap.getDirectionFromTo(loc, nextNpc.getLoc(), gameMap.height, gameMap.width);
-                }
-            } else {
-                List<Piece> nonOwnNeighbors = getAllNonOwnNeighbors(myID);
-                int tempProd = -1;
-
-                for (Piece nonOwnNeighbor : nonOwnNeighbors) {
-                    if (nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
-                        retDirection = gameMap.getDirectionFromTo(getLoc(), nonOwnNeighbor.getLoc(), gameMap.height, gameMap.width);
-                        tempProd = nonOwnNeighbor.getProduction();
-                    }
+                if(nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
+                    retDirection = gameMap.getDirectionFromTo(getLoc(), nonOwnNeighbor.getLoc(), gameMap.height, gameMap.width);
+                    tempProd = nonOwnNeighbor.getProduction();
                 }
             }
-
         }
 
         return retDirection;
@@ -68,8 +50,7 @@ class Piece {
         List<Piece> pieces = new ArrayList<>();
 
         for (Direction direction : Direction.CARDINALS) {
-            if (getNonOwnNeighborByDirection(myID, direction) != null)
-                pieces.add(getNonOwnNeighborByDirection(myID, direction));
+            if(getNonOwnNeighborByDirection(myID, direction) != null) pieces.add(getNonOwnNeighborByDirection(myID, direction));
         }
 
         return pieces;
@@ -77,7 +58,7 @@ class Piece {
 
     private Piece getNonOwnNeighborByDirection(int myID, Direction direction) {
         Site site = gameMap.getSite(getLoc(), direction);
-        if (site.owner != myID) return new Piece(gameMap.getLocation(getLoc(), direction), site, gameMap);
+        if(site.owner != myID) return new Piece(gameMap.getLocation(getLoc(), direction), site, gameMap);
         return null;
     }
 
@@ -151,7 +132,7 @@ class Piece {
 //    }
 //
 //    private boolean hasEnemyNeighborAt(Location loc, int myID, Direction direction) {
-//        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != MyBot.npcID;
+//        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != Eleventh.npcID;
 //    }
 
     private boolean hasOnlyOwnNeighbors(int myID) {

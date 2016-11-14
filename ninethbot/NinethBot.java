@@ -3,15 +3,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class MyBot {
+/**
+ * this bot will just move to new tiles when it is an enemy /empty tile, otherwise it just
+ * grows until the tiles are full
+ */
+public class NinethBot {
 
     static Logger logger;
 
     private static int frame = 0;
 
-    private static final String botName = "seventhBot";
+    private static final String botName = "ninethBot";
 
     private static GameMap gameMap = null;
+
+    static int npcID = 0;
 
     public static void main(String[] args) throws IOException {
         logger = new Logger(botName);
@@ -37,7 +43,7 @@ public class MyBot {
             List<Piece> ownPiecesFromOuterToInner = gameInformation.getOwnPiecesFromOuterToInner(myID);
 
             for (Piece piece : ownPiecesFromOuterToInner) {
-                Direction direction = piece.getNextNonEnemyNonOwnDirectionThatItCanMoveTo(myID);
+                Direction direction = piece.getNextNonEnemyNonOwnDirectionThatItCanMoveTo(myID, gameInformation.getNpcs());
                 moves.add(new Move(piece.getLoc(), direction));
             }
 

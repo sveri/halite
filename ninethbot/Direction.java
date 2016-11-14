@@ -28,4 +28,6 @@ enum Direction {
     public static Direction randomDirection() {
         return fromInteger(new Random().nextInt(5));
     }
+
+
 }

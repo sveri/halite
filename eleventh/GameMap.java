@@ -75,9 +75,40 @@ public class GameMap{
         return l;
     }
 
+    Direction getDirectionFromTo(Location from, Location to, int heigth, int width) {
+        // need to move on y line
+        if(from.x == to.x) {
+            if(from.y < to.y && (to.y - from.y) < heigth / 2) {
+                return Direction.SOUTH;
+            } else if(from.y < to.y && (to.y - from.y) >= heigth / 2) {
+                return Direction.NORTH;
+            } else if(to.y < from.y && (from.y - to.y) < heigth / 2) {
+                return Direction.NORTH;
+            } else {
+                return Direction.SOUTH;
+            }
+        }
+        // need to move on x line
+        else {
+            if (from.x < to.x && (to.x - from.x) < width / 2) {
+                return Direction.EAST;
+            } else if (from.x < to.x && (to.x - from.x) >= width / 2) {
+                return Direction.WEST;
+            } else if (to.x < from.x && (from.x - to.x) < width / 2) {
+                return Direction.WEST;
+            }
+            return Direction.EAST;
+        }
+    }
+
     public Site getSite(Location loc, Direction dir) {
         Location l = getLocation(loc, dir);
         return contents.get(l.y).get(l.x);
+    }
+
+    public int getOwner(Location loc, Direction dir) {
+        Location l = getLocation(loc, dir);
+        return contents.get(l.y).get(l.x).owner;
     }
 
     public Site getSite(Location loc) {

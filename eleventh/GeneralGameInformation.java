@@ -62,27 +62,27 @@ public class GeneralGameInformation {
     List<Piece> getOwnPiecesFromOuterToInner(int myID) {
         List<Piece> retPieces = new ArrayList<>();
         for (Piece piece : this.owns) {
-            if(piece.hasNOtherNeigbhors(myID, 4)) {
+            if(piece.hasXOtherNeighbors(myID, 4)) {
                 retPieces.add(piece);
             }
         }
         for (Piece piece : this.owns) {
-            if(piece.hasNOtherNeigbhors(myID, 3)) {
+            if(piece.hasXOtherNeighbors(myID, 3)) {
                 retPieces.add(piece);
             }
         }
         for (Piece piece : this.owns) {
-            if(piece.hasNOtherNeigbhors(myID, 2)) {
+            if(piece.hasXOtherNeighbors(myID, 2)) {
                 retPieces.add(piece);
             }
         }
         for (Piece piece : this.owns) {
-            if(piece.hasNOtherNeigbhors(myID, 1)) {
+            if(piece.hasXOtherNeighbors(myID, 1)) {
                 retPieces.add(piece);
             }
         }
         for (Piece piece : this.owns) {
-            if(piece.hasNOtherNeigbhors(myID, 0)) {
+            if(piece.hasXOtherNeighbors(myID, 0)) {
                 retPieces.add(piece);
             }
         }
