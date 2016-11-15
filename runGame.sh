@@ -21,11 +21,11 @@ javac -d ../bin/thirteenth -cp .:commons-math3-3.6.1.jar Thirteenth.java
 cd ..
 
 cd mybot
-javac -d ../bin/mybot  -cp .:commons-math3-3.6.1.jar MyBot.java
+javac -d ../bin/mybot MyBot.java
 cd ..
 
 
-halite -q -d "40 40" "java -cp .:bin/mybot/:mybot/commons-math3-3.6.1.jar MyBot" "java -cp .:bin/thirteenth/:thirteenth/commons-math3-3.6.1.jar Thirteenth" "java -cp .:bin/eleventh/ Eleventh" "java -cp .:bin/twelth/ Twelth"
+halite -q -d "40 40" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/thirteenth/:thirteenth/commons-math3-3.6.1.jar Thirteenth" "java -cp .:bin/eleventh/ Eleventh" "java -cp .:bin/twelth/ Twelth"
 
 
 
