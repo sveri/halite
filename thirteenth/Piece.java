@@ -50,9 +50,9 @@ class Piece {
                 && (closestNpcWithXProduction.getProduction() > -1
                 && moveAccordingToOwnStrength())) {
             retDirection = nextNpcDirection;
-            MyBot.logger.info(this.toString());
-            MyBot.logger.info(nextPiece.toString());
-            MyBot.logger.info(nextNpcDirection.toString());
+            Thirteenth.logger.info(this.toString());
+            Thirteenth.logger.info(nextPiece.toString());
+            Thirteenth.logger.info(nextNpcDirection.toString());
 //            List<Piece> npcsAndEnemies = new ArrayList<>();
 //            npcsAndEnemies.addAll(gameInformation.getNpcs());
 //            npcsAndEnemies.addAll(gameInformation.getEnemies());
@@ -185,7 +185,7 @@ class Piece {
     }
 
     private boolean hasEnemyNeighborAt(Location loc, int myID, Direction direction) {
-        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != MyBot.npcID;
+        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != Thirteenth.npcID;
     }
 
     private boolean hasOnlyOwnNeighbors(int myID) {

@@ -7,11 +7,11 @@ import java.util.List;
  * this bot will just move to new tiles when it is an enemy /empty tile, otherwise it just
  * grows until the tiles are full
  */
-public class MyBot {
+public class Thirteenth {
 
     static Logger logger;
 
-    private static final String botName = "sveriBot";
+    private static final String botName = "thirteenthBot";
 
     private static GameMap gameMap = null;
 
