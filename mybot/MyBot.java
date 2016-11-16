@@ -19,6 +19,10 @@ public class MyBot {
 
     static int npcID= 0;
 
+    static Piece nextPieceToConquer = new NullPiece();
+
+    static int findNextPieceToConquerInXFrames = 0;
+
     public static void main(String[] args) throws IOException {
         logger = new Logger(botName);
         addShutdownHook(logger);
@@ -32,12 +36,18 @@ public class MyBot {
 
         Networking.sendInit(botName);
 
+
+
+
         while (true) {
             ArrayList<Move> moves = new ArrayList<>();
             gameMap = Networking.getFrame();
-            GeneralGameInformation gameInformation = getGeneralGameInformation(gameMap, myID);
+
+            GeneralGameInformation gameInformation = GeneralGameInformation.fromGeneralGameInformation(gameMap, myID);
+            gameInformation.setNextPieceToConquer(gameInformation.getOwns().get(0));
 
             logger.info("Frame: " + frame);
+            logger.info("first piece to conquer: " + nextPieceToConquer);
 
             List<Piece> ownPiecesFromOuterToInner = gameInformation.getOwnPiecesFromOuterToInner(myID);
 
@@ -49,21 +59,6 @@ public class MyBot {
             Networking.sendFrame(moves);
             frame++;
         }
-    }
-
-    private static GeneralGameInformation getGeneralGameInformation(GameMap gameMap, int myID) {
-        GeneralGameInformation info = new GeneralGameInformation();
-        for (int y = 0; y < gameMap.height; y++) {
-            for (int x = 0; x < gameMap.width; x++) {
-                Piece piece = Piece.fromXY(x, y, gameMap);
-                if(piece.getOwner() == 0) info.addToNpcs(piece);
-                else if(piece.getOwner() == myID) info.addToOwn(piece);
-                else info.addToEnemies(piece);
-            }
-
-        }
-
-        return info;
     }
 
     private static void addShutdownHook(final Logger logger) {

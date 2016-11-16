@@ -11,7 +11,7 @@ public class Sixteenth {
 
     static Logger logger;
 
-    private static final String botName = "sveriBot";
+    private static final String botName = "sixteenthBot";
 
     private static GameMap gameMap = null;
 

@@ -35,39 +35,70 @@ class Piece {
     Direction findNextDirection(int myID, GeneralGameInformation gameInformation) {
         Direction retDirection = Direction.STILL;
 
-        Enemy enemy = new Enemy(gameMap, myID);
+        int nextPieceToConquerOwner = gameMap.getSite(MyBot.nextPieceToConquer.getLoc()).owner;
 
-        if (enemy.hasDirectEnemyNeighbor(getLoc())) {
-            Piece nextEnemy = enemy.getEnemyNeighbor(this);
-            if (!nextEnemy.isNil()) {
-                retDirection = gameMap.getFromPieceToPiece(this, nextEnemy);
-            } else retDirection = Direction.STILL;
+        if (nextPieceToConquerOwner != myID && moveAccordingToOwnStrength()) {
 
-        } else if (hasOnlyOwnNeighbors(myID)) {
-            List<Piece> npcsAndEnemies = new ArrayList<>();
-            npcsAndEnemies.addAll(gameInformation.getNpcs());
-            npcsAndEnemies.addAll(gameInformation.getEnemies());
-            Piece nextNpc = findClosestNonOwnPiece(npcsAndEnemies);
-            if (nextNpc != null && moveAccordingToOwnStrength()) {
+            Piece nextPiece = Piece.fromLocationAndDirection(getLoc(), gameMap.getFromPieceToPiece(this, MyBot.nextPieceToConquer), gameMap);
+            if (nextPiece.getStrength() < getStrength())
+                retDirection = gameMap.getFromPieceToPiece(this, MyBot.nextPieceToConquer);
+        } else if (nextPieceToConquerOwner == myID && hasOnlyOwnNeighbors(myID) ) {
+
+            Piece nextNpc = findClosestNonOwnPiece(gameInformation.getNpcsAndEnemies());
+            if (!nextNpc.isNil() && moveAccordingToOwnStrength()) {
                 retDirection = gameMap.getDirectionFromTo(loc, nextNpc.getLoc(), gameMap.height, gameMap.width);
             }
-        } else {
+        } else if (nextPieceToConquerOwner == myID) {
             List<Piece> nonOwnNeighbors = getAllNonOwnNeighbors(myID);
             int tempProd = -1;
 
             for (Piece nonOwnNeighbor : nonOwnNeighbors) {
-                if(nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
+                if (nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
                     retDirection = gameMap.getDirectionFromTo(getLoc(), nonOwnNeighbor.getLoc(), gameMap.height, gameMap.width);
                     tempProd = nonOwnNeighbor.getProduction();
                 }
             }
         }
 
+
+        if (nextPieceToConquerOwner == myID && MyBot.findNextPieceToConquerInXFrames > 0)
+            MyBot.findNextPieceToConquerInXFrames--;
+
+
+
+//        Enemy enemy = new Enemy(gameMap, myID);
+//
+//        if (enemy.hasDirectEnemyNeighbor(getLoc())) {
+//            Piece nextEnemy = enemy.getEnemyNeighbor(this);
+//            if (!nextEnemy.isNil() && nextEnemy.getStrength() <= getStrength() && getStrength() > 200) {
+//                retDirection = gameMap.getFromPieceToPiece(this, nextEnemy);
+//            } else retDirection = Direction.STILL;
+//
+//        } else if (hasOnlyOwnNeighbors(myID)) {
+//            List<Piece> npcsAndEnemies = new ArrayList<>();
+//            npcsAndEnemies.addAll(gameInformation.getNpcs());
+//            npcsAndEnemies.addAll(gameInformation.getEnemies());
+//            Piece nextNpc = findClosestNonOwnPiece(npcsAndEnemies);
+//            if (nextNpc != null && moveAccordingToOwnStrength()) {
+//                retDirection = gameMap.getDirectionFromTo(loc, nextNpc.getLoc(), gameMap.height, gameMap.width);
+//            }
+//        } else {
+//            List<Piece> nonOwnNeighbors = getAllNonOwnNeighbors(myID);
+//            int tempProd = -1;
+//
+//            for (Piece nonOwnNeighbor : nonOwnNeighbors) {
+//                if(nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
+//                    retDirection = gameMap.getDirectionFromTo(getLoc(), nonOwnNeighbor.getLoc(), gameMap.height, gameMap.width);
+//                    tempProd = nonOwnNeighbor.getProduction();
+//                }
+//            }
+//        }
+
         return retDirection;
     }
 
     private Piece findClosestNonOwnPiece(List<Piece> npcsAndEnemies) {
-        Piece npcOrEnemie = null;
+        Piece npcOrEnemie = new NullPiece();
         if (npcsAndEnemies.size() > 0) {
             npcOrEnemie = npcsAndEnemies.get(0);
             for (Piece piece : npcsAndEnemies) {
@@ -82,55 +113,6 @@ class Piece {
     }
 
 
-    // v16
-//    Direction findNextDirection(int myID, GeneralGameInformation gameInformation) {
-//        Direction retDirection = Direction.STILL;
-//
-//        List<Piece> npcsAndEnemies = gameInformation.getNpcsAndEnemies();
-//        Piece closestNonMePieceWithProduction = findMostValuablePiece(npcsAndEnemies, gameInformation);
-//
-//        Enemy enemy = new Enemy(gameMap, myID);
-//
-//        if (enemy.hasDirectEnemyNeighbor(getLoc())) {
-//            Piece nextEnemy = enemy.getEnemyNeighbor(this);
-//            if (!nextEnemy.isNil()) {
-//                retDirection = gameMap.getFromPieceToPiece(this, nextEnemy);
-//            } else retDirection = Direction.STILL;
-//
-//        } else if(moveAccordingToOwnStrength()){
-////            gameMap.getDi
-//                            Direction nextNpcDirection = gameMap.getDirectionFromTo(this.getLoc(), closestNonMePieceWithProduction.getLoc(), gameMap.height, gameMap.width);
-//            Piece nextPiece = Piece.fromLocationAndDirection(getLoc(), nextNpcDirection, gameMap);
-//            retDirection = nextNpcDirection;
-//
-//        }
-//
-//
-////        else if (hasTwoOrMoreOwnNeighbors(myID) && !closestNonMePieceWithProduction.isNil()
-////                && moveAccordingToOwnStrength()) {
-////                Direction nextNpcDirection = gameMap.getDirectionFromTo(this.getLoc(), closestNonMePieceWithProduction.getLoc(), gameMap.height, gameMap.width);
-////                Piece nextPiece = Piece.fromLocationAndDirection(getLoc(), nextNpcDirection, gameMap);
-////                retDirection = nextNpcDirection;
-////                MyBot.logger.info(this.toString());
-////                MyBot.logger.info(closestNonMePieceWithProduction.toString());
-////                MyBot.logger.info(nextPiece.toString());
-////                MyBot.logger.info(nextNpcDirection.toString());
-////
-////        } else {
-////            List<Piece> nonOwnNeighbors = getAllNonOwnNeighbors(myID);
-////            int tempProd = -1;
-////
-////            for (Piece nonOwnNeighbor : nonOwnNeighbors) {
-////                if (nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
-////                    retDirection = gameMap.getDirectionFromTo(getLoc(), nonOwnNeighbor.getLoc(), gameMap.height, gameMap.width);
-////                    tempProd = nonOwnNeighbor.getProduction();
-////                }
-////            }
-////        }
-//
-//
-//        return retDirection;
-//    }
 
     private List<Piece> getAllNonOwnNeighbors(int myID) {
         List<Piece> pieces = new ArrayList<>();
@@ -167,21 +149,19 @@ class Piece {
     }
 
 
-
     private Piece findMostValuablePieceWitdhProduction(List<Piece> npcsAndEnemies, int production) {
 
         return npcsAndEnemies.stream()
                 .filter(p -> p.getProduction() >= production)
-//                .min((p1, p2) -> (int) (gameMap.getDistance(loc, p1.getLoc())))
                 .reduce(new NullPiece(), (p1, p2) -> {
-                    if(!p1.isNil()
-                        && gameMap.getDistance(loc, p1.getLoc()) < gameMap.getDistance(loc, p2.getLoc()))
+                    if (!p1.isNil()
+                            && gameMap.getDistance(loc, p1.getLoc()) < gameMap.getDistance(loc, p2.getLoc()))
                         return p1;
                     else return p2;
                 });
-//                .orElse(new NullPiece());
     }
 
+    // v11
     private boolean moveAccordingToOwnStrength() {
         return (getProduction() == 0
                 || getProduction() == 1 && getStrength() > 2)
@@ -198,8 +178,27 @@ class Piece {
                 || (getProduction() == 12 && getStrength() > 80)
                 || (getProduction() == 13 && getStrength() > 90)
                 || (getProduction() == 14 && getStrength() > 100)
-                || (getProduction() == 15 && getStrength() > 105)
-                || (getProduction() == 16 && getStrength() > 110);
+                || (getProduction() == 15 && getStrength() > 110)
+                || (getProduction() == 16 && getStrength() > 120);
+
+//    private boolean moveAccordingToOwnStrength() {
+//        return (getProduction() == 0
+//                || getProduction() == 1 && getStrength() > 2)
+//                || (getProduction() == 2 && getStrength() > 5)
+//                || (getProduction() == 3 && getStrength() > 10)
+//                || (getProduction() == 4 && getStrength() > 20)
+//                || (getProduction() == 5 && getStrength() > 30)
+//                || (getProduction() == 6 && getStrength() > 40)
+//                || (getProduction() == 7 && getStrength() > 50)
+//                || (getProduction() == 8 && getStrength() > 60)
+//                || (getProduction() == 9 && getStrength() > 65)
+//                || (getProduction() == 10 && getStrength() > 70)
+//                || (getProduction() == 11 && getStrength() > 75)
+//                || (getProduction() == 12 && getStrength() > 80)
+//                || (getProduction() == 13 && getStrength() > 90)
+//                || (getProduction() == 14 && getStrength() > 100)
+//                || (getProduction() == 15 && getStrength() > 105)
+//                || (getProduction() == 16 && getStrength() > 110);
 
 
 //    private boolean moveAccordingToOwnStrength() {

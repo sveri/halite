@@ -14,20 +14,26 @@ class Enemy {
 
 
     Piece getEnemyNeighbor(Piece curPiece) {
-        Map<Direction, Integer> dirToStrength = new HashMap<>();
+        Map<Direction, Integer> directionToEnemyStrength = new HashMap<>();
 
         for (Direction direction : Direction.CARDINALS) {
             int strengthOfAllConnectedEnemies = getStrengthOfAllConnectedEnemies(curPiece, direction);
-            if(strengthOfAllConnectedEnemies > 0) dirToStrength.put(direction, strengthOfAllConnectedEnemies);
+            if(strengthOfAllConnectedEnemies > 0) directionToEnemyStrength.put(direction, strengthOfAllConnectedEnemies);
         }
 
-        if (dirToStrength.isEmpty()) {
-            return new NullPiece();
+        Piece tempPiece = new NullPiece();
+
+        for (Map.Entry<Direction, Integer> entry : directionToEnemyStrength.entrySet()) {
+            Direction curEnemyDirection = entry.getKey();
+            Integer curEnemyStrength = entry.getValue();
+
+            if(curPiece.getStrength() >= curEnemyStrength && curEnemyStrength > tempPiece.getStrength()){
+                tempPiece = Piece.fromLocationAndDirection(curPiece.getLoc(), curEnemyDirection, gameMap);
+            }
+
         }
 
-        Direction directionMinStrength = Collections.min(dirToStrength.entrySet(), (entry1, entry2) -> entry1.getValue() - entry2.getValue()).getKey();
-
-        return Piece.fromLocationAndDirection(curPiece.getLoc(), directionMinStrength, gameMap);
+        return tempPiece;
     }
 
     private int getStrengthOfAllConnectedEnemies(Piece curPiece, Direction direction) {

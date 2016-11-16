@@ -181,6 +181,7 @@ class Piece {
 //                .orElse(new NullPiece());
     }
 
+
     private boolean moveAccordingToOwnStrength() {
         return (getProduction() == 0
                 || getProduction() == 1 && getStrength() > 2)

@@ -8,9 +8,9 @@ rm *.hlt
 #javac -d ../bin/standstillbot StandstillBot.java
 #cd ..
 
-cd twelth
-javac -d ../bin/twelth Twelth.java
-cd ..
+#cd twelth
+#javac -d ../bin/twelth Twelth.java
+#cd ..
 
 cd eleventh
 javac -d ../bin/eleventh Eleventh.java
@@ -33,7 +33,7 @@ javac -d ../bin/mybot MyBot.java
 cd ..
 
 
-halite -q -d "25 25" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/eleventh/ Eleventh" "java -cp .:bin/v16/ Sixteenth"
+halite -q -d "30 30" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/eleventh/ Eleventh" "java -cp .:bin/v16/ Sixteenth"
 
 
 

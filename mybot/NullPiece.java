@@ -52,4 +52,6 @@ public class NullPiece extends Piece{
 
     @Override
     public boolean isNil() { return true; }
+
+
 }
