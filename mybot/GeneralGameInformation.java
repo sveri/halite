@@ -104,18 +104,17 @@ public class GeneralGameInformation {
 
 
     int getTopNPercentEnemyProduction(int percent){
-        List<Integer> strengths = new ArrayList<>();
+        List<Integer> productions = new ArrayList<>();
 
         for (Piece piece : getNpcsAndEnemies()) {
-            strengths.add(piece.getStrength());
+            productions.add(piece.getProduction());
         }
 
         Comparator<Integer> natural = Comparator.<Integer>naturalOrder();
-        strengths.sort(natural);
+        productions.sort(natural);
+        int n = (int) ((double) percent / 100 * productions.size());
 
-        int n = (int) percent / 100 * strengths.size();
-
-        return strengths.get(n);
+        return productions.get(n);
     }
 
 }

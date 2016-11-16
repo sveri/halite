@@ -21,6 +21,11 @@ class Logger implements Closeable {
         out.flush();
     }
 
+    public void info(int number) {
+        out.println(number);
+        out.flush();
+    }
+
     @Override
     public void close() throws IOException {
         out.close();

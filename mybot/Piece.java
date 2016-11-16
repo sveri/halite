@@ -34,26 +34,26 @@ class Piece {
 
         List<Piece> npcsAndEnemies = gameInformation.getNpcsAndEnemies();
 
-        int prodGoal = (int) gameInformation.getTopNPercentEnemyProduction(85);
-        Piece closestNpcWithXProduction = findClosestPieceWithProduction(npcsAndEnemies, prodGoal);
-        Direction nextNpcDirection = gameMap.getDirectionFromTo(this.getLoc(), closestNpcWithXProduction.getLoc(), gameMap.height, gameMap.width);
+        int prodGoal = gameInformation.getTopNPercentEnemyProduction(97);
+        MyBot.logger.info(prodGoal);
+        Piece closestNonMePieceWithProduction = findClosestPieceWithProduction(npcsAndEnemies, prodGoal);
+        Direction nextNpcDirection = gameMap.getDirectionFromTo(this.getLoc(), closestNonMePieceWithProduction.getLoc(), gameMap.height, gameMap.width);
 //        Piece nextPiece = Piece.fromLocationAndDirection(getLoc(), nextNpcDirection, gameMap);
 
         Enemy enemy = new Enemy(gameMap, myID);
 
-        if (enemy.hasDirectEnemyNeighbor(getLoc())){
+        if (enemy.hasDirectEnemyNeighbor(getLoc())) {
             Piece nextEnemy = enemy.getEnemyNeighbor(this);
-            if(!nextEnemy.isNil()) {
+            if (!nextEnemy.isNil()) {
                 retDirection = gameMap.getFromPieceToPiece(this, nextEnemy);
 //                MyBot.logger.info(this.toString());
 //                MyBot.logger.info(Piece.fromLocationAndDirection(getLoc(), retDirection, gameMap).toString());
 //                MyBot.logger.info(retDirection.toString());
-            }
-            else retDirection = Direction.STILL;
+            } else retDirection = Direction.STILL;
 
-        } else if (hasOnlyOwnNeighbors(myID)
-                && (closestNpcWithXProduction.getProduction() > -1
-                && moveAccordingToOwnStrength())) {
+        } else if (hasTwoOrMoreOwnNeighbors(myID)
+                && !closestNonMePieceWithProduction.isNil()
+                && moveAccordingToOwnStrength()) {
             retDirection = nextNpcDirection;
 //            MyBot.logger.info(this.toString());
 //            MyBot.logger.info(nextPiece.toString());
@@ -64,7 +64,7 @@ class Piece {
             int tempProd = -1;
 
             for (Piece nonOwnNeighbor : nonOwnNeighbors) {
-                if(nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
+                if (nonOwnNeighbor.getStrength() < getStrength() && nonOwnNeighbor.getProduction() > tempProd) {
                     retDirection = gameMap.getDirectionFromTo(getLoc(), nonOwnNeighbor.getLoc(), gameMap.height, gameMap.width);
                     tempProd = nonOwnNeighbor.getProduction();
                 }
@@ -167,6 +167,10 @@ class Piece {
         return hasXOtherNeighbors(myID, 0);
     }
 
+    private boolean hasTwoOrMoreOwnNeighbors(int myID) {
+        return hasXOtherNeighbors(myID, 0) || hasXOtherNeighbors(myID, 1) || hasXOtherNeighbors(myID, 2);
+    }
+
     boolean hasXOtherNeighbors(int myID, int expectedNeighborCount) {
         int neighborCount = 0;
         if (gameMap.getSite(loc, Direction.EAST).owner != myID) neighborCount++;
@@ -205,17 +209,23 @@ class Piece {
         return this.getSite().production;
     }
 
-    public boolean isNil() { return false;}
+    public boolean isNil() {
+        return false;
+    }
 
     GameMap getGameMap() {
         return gameMap;
     }
 
-    boolean isMe(int myID) { return getOwner() == myID;}
+    boolean isMe(int myID) {
+        return getOwner() == myID;
+    }
 
-    boolean isNpc() { return getOwner() == MyBot.npcID;}
+    boolean isNpc() {
+        return getOwner() == MyBot.npcID;
+    }
 
     boolean isEnemy(int myID) {
-        return !isMe(myID) && ! isNpc();
+        return !isMe(myID) && !isNpc();
     }
 }
