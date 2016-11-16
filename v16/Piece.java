@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 class Piece {
@@ -36,7 +35,7 @@ class Piece {
         Direction retDirection = Direction.STILL;
 
         Enemy enemy = new Enemy(gameMap, myID);
-
+        
         if (enemy.hasDirectEnemyNeighbor(getLoc())) {
             Piece nextEnemy = enemy.getEnemyNeighbor(this);
             if (!nextEnemy.isNil()) {
@@ -111,10 +110,10 @@ class Piece {
 ////                Direction nextNpcDirection = gameMap.getDirectionFromTo(this.getLoc(), closestNonMePieceWithProduction.getLoc(), gameMap.height, gameMap.width);
 ////                Piece nextPiece = Piece.fromLocationAndDirection(getLoc(), nextNpcDirection, gameMap);
 ////                retDirection = nextNpcDirection;
-////                MyBot.logger.info(this.toString());
-////                MyBot.logger.info(closestNonMePieceWithProduction.toString());
-////                MyBot.logger.info(nextPiece.toString());
-////                MyBot.logger.info(nextNpcDirection.toString());
+////                Sixteenth.logger.info(this.toString());
+////                Sixteenth.logger.info(closestNonMePieceWithProduction.toString());
+////                Sixteenth.logger.info(nextPiece.toString());
+////                Sixteenth.logger.info(nextNpcDirection.toString());
 ////
 ////        } else {
 ////            List<Piece> nonOwnNeighbors = getAllNonOwnNeighbors(myID);
@@ -305,7 +304,7 @@ class Piece {
     }
 
     boolean isNpc() {
-        return getOwner() == MyBot.npcID;
+        return getOwner() == Sixteenth.npcID;
     }
 
     boolean isEnemy(int myID) {
