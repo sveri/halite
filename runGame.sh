@@ -12,17 +12,17 @@ rm *.hlt
 #javac -d ../bin/twelth Twelth.java
 #cd ..
 
-cd eleventh
-javac -d ../bin/eleventh Eleventh.java
-cd ..
+#cd eleventh
+#javac -d ../bin/eleventh Eleventh.java
+#cd ..
+#
+#cd v16
+#javac -d ../bin/v16 Sixteenth.java
+#cd ..
 
-cd v16
-javac -d ../bin/v16 Sixteenth.java
-cd ..
-
-cd eleventh
-javac -d ../bin/eleventh Eleventh.java
-cd ..
+#cd v17
+#javac -d ../bin/v17 Seventeenth.java
+#cd ..
 
 #cd thirteenth
 #javac -d ../bin/thirteenth -cp .:commons-math3-3.6.1.jar Thirteenth.java
@@ -33,7 +33,7 @@ javac -d ../bin/mybot MyBot.java
 cd ..
 
 
-halite -q -d "30 30" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/eleventh/ Eleventh" "java -cp .:bin/v16/ Sixteenth"
+halite -q -d "35 35" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/eleventh/ Eleventh" "java -cp .:bin/v16/ Sixteenth"
 
 
 
