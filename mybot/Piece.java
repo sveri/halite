@@ -38,18 +38,49 @@ class Piece {
 
 
 
-    public Direction findNextDirection(int myID, GeneralGameInformation gameInformation) {
-        if (!hasOnlyOwnNeighbors(myID)) {
+    Direction findNextDirection(int myID, GeneralGameInformation gameInformation) {
+        int maxStrength = 100;
+
+//        Enemy enemy = new Enemy(gameMap, myID);
+//        if(enemy.hasDirectEnemyNeighbor(getLoc())){
+//            if(getStrength() > 230) {
+//                return gameMap.getFromPieceToPiece(this, enemy.getEnemyNeighbor(this));
+//            }
+//            return Direction.STILL;
+//        }
+
+        if (hasNpcAndEnemyNeighbors(myID, maxStrength)) {
             List<Piece> npcNeighbors = getNpcNeighbors();
+
+
             Piece retPiece = npcNeighbors.stream()
                     .filter(piece -> piece.getStrength() < getStrength())
                     .max(new PieceProductionComparator()).orElse(new NullPiece());
 
+
+            //calcualate piece for next round, if it could go to one with a better prod
+            // in next round, wait instead
+            Piece retPieceNextRound = npcNeighbors.stream()
+                    .filter(piece -> piece.getStrength() < getStrength() + getProduction())
+                    .max(new PieceProductionComparator()).orElse(new NullPiece());
+
+
+            //calcualate piece for next round, if it could go to one with a better prod
+            // in next round, wait instead
+            Piece retPieceThirdRound = npcNeighbors.stream()
+                    .filter(piece -> piece.getStrength() < getStrength() + getProduction() + getProduction())
+                    .max(new PieceProductionComparator()).orElse(new NullPiece());
+
+            if(retPieceThirdRound.getProduction() > retPieceNextRound.getProduction()
+                    || retPieceNextRound.getProduction() > retPiece.getProduction())
+                return Direction.STILL;
+
             if(!retPiece.isNil())
                 return gameMap.getFromPieceToPiece(this, retPiece);
+
         } else if(moveAccordingToOwnStrength()){
             List<Piece> pieces = gameInformation.getOwns().stream()
-                    .filter(piece -> !piece.hasOnlyOwnNeighbors(myID))
+                    .filter(piece -> !piece.hasOnlyOwnNeighbors(myID, 256))
                     .sorted(new PieceDistanceComparator(gameMap, this)).collect(Collectors.toList());
 
             int shortestDistance = (int) gameMap.getDistance(this.getLoc(), pieces.get(0).getLoc());
@@ -324,24 +355,28 @@ class Piece {
 //                || (getProduction() == 16 && getStrength() > 90);
 //    }
 
-    private boolean hasOnlyOwnNeighbors(int myID) {
-        return hasXOtherNeighbors(myID, 0);
+    private boolean hasNpcAndEnemyNeighbors(int myID, int maxStrength) {
+        return !hasOnlyOwnNeighbors(myID, maxStrength);
     }
 
-    private boolean hasTwoOrMoreOwnNeighbors(int myID) {
-        return hasXOtherNeighbors(myID, 0) || hasXOtherNeighbors(myID, 1) || hasXOtherNeighbors(myID, 2);
+    private boolean hasOnlyOwnNeighbors(int myID, int maxStrength) {
+        return hasXOtherNeighbors(myID, 0, maxStrength);
     }
 
-    private boolean hasThreeOrMoreOwnNeighbors(int myID) {
-        return hasXOtherNeighbors(myID, 0) || hasXOtherNeighbors(myID, 1);
-    }
+//    private boolean hasTwoOrMoreOwnNeighbors(int myID) {
+//        return hasXOtherNeighbors(myID, 0) || hasXOtherNeighbors(myID, 1) || hasXOtherNeighbors(myID, 2);
+//    }
+//
+//    private boolean hasThreeOrMoreOwnNeighbors(int myID, int maxStrength) {
+//        return hasXOtherNeighbors(myID, 0) || hasXOtherNeighbors(myID, 1);
+//    }
 
-    boolean hasXOtherNeighbors(int myID, int expectedNeighborCount) {
+    boolean hasXOtherNeighbors(int myID, int expectedNeighborCount, int maxStrength) {
         int neighborCount = 0;
-        if (gameMap.getSite(loc, Direction.EAST).owner != myID) neighborCount++;
-        if (gameMap.getSite(loc, Direction.SOUTH).owner != myID) neighborCount++;
-        if (gameMap.getSite(loc, Direction.WEST).owner != myID) neighborCount++;
-        if (gameMap.getSite(loc, Direction.NORTH).owner != myID) neighborCount++;
+        if (gameMap.getSite(loc, Direction.EAST).owner != myID && gameMap.getSite(loc, Direction.EAST).strength < maxStrength) neighborCount++;
+        if (gameMap.getSite(loc, Direction.SOUTH).owner != myID && gameMap.getSite(loc, Direction.SOUTH).strength < maxStrength) neighborCount++;
+        if (gameMap.getSite(loc, Direction.WEST).owner != myID && gameMap.getSite(loc, Direction.WEST).strength < maxStrength) neighborCount++;
+        if (gameMap.getSite(loc, Direction.NORTH).owner != myID && gameMap.getSite(loc, Direction.NORTH).strength < maxStrength) neighborCount++;
 
         return neighborCount == expectedNeighborCount;
     }

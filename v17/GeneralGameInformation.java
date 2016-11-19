@@ -95,9 +95,9 @@ public class GeneralGameInformation {
     }
 
 //    void setNextPieceToConquer(Piece conquerFromHere) {
-//        if (MyBot.nextPieceToConquer.isNil()) {
-//            MyBot.nextPieceToConquer = findMostValuablePiece(getNpcsAndEnemies(), conquerFromHere);
-//            MyBot.logger.info("setting next piece to conquer to: " + MyBot.nextPieceToConquer);
+//        if (Seventeenth.nextPieceToConquer.isNil()) {
+//            Seventeenth.nextPieceToConquer = findMostValuablePiece(getNpcsAndEnemies(), conquerFromHere);
+//            Seventeenth.logger.info("setting next piece to conquer to: " + Seventeenth.nextPieceToConquer);
 //        }
 //    }
 //
@@ -158,7 +158,7 @@ public class GeneralGameInformation {
 //    public List<Piece> getXPiecesClosestToToConquerPiece(Piece nextPieceToConquer) {
 //        List<Piece> retPieces = new ArrayList<>();
 //        for (Piece own : getOwns()) {
-//            if (retPieces.size() < MyBot.soManyPiecesMustConquer) {
+//            if (retPieces.size() < Seventeenth.soManyPiecesMustConquer) {
 //                retPieces.add(own);
 //            } else {
 //

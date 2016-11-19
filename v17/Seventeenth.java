@@ -7,11 +7,11 @@ import java.util.List;
  * this bot will just move to new tiles when it is an enemy /empty tile, otherwise it just
  * grows until the tiles are full
  */
-public class MyBot {
+public class Seventeenth {
 
     static Logger logger;
 
-    private static final String botName = "sveriBot";
+    private static final String botName = "seventeenthBot";
 
     private static GameMap gameMap = null;
 
@@ -70,10 +70,10 @@ public class MyBot {
 //                moves.add(new Move(piece.getLoc(), piece.findNextDirectionForClosestPiece()));
 //            }
 
-//            if(!MyBot.nextPieceToConquer.isNil() &&
-//                    gameMap.getSite(MyBot.nextPieceToConquer.getLoc()).owner == myID) {
-//                MyBot.logger.info("nilling next piece to conquer");
-//                MyBot.nextPieceToConquer = new NullPiece();
+//            if(!Seventeenth.nextPieceToConquer.isNil() &&
+//                    gameMap.getSite(Seventeenth.nextPieceToConquer.getLoc()).owner == myID) {
+//                Seventeenth.logger.info("nilling next piece to conquer");
+//                Seventeenth.nextPieceToConquer = new NullPiece();
 //            }
 
             Networking.sendFrame(moves);

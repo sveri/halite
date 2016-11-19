@@ -95,6 +95,6 @@ class Enemy {
     }
 
     private boolean hasEnemyNeighborAt(Location loc, Direction direction) {
-        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != MyBot.npcID;
+        return gameMap.getOwner(loc, direction) != myID && gameMap.getOwner(loc, direction) != Seventeenth.npcID;
     }
 }

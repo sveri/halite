@@ -15,10 +15,10 @@ public class NullPiece extends Piece{
 //        return Direction.STILL;
 //    }
 
-    @Override
-    boolean hasXOtherNeighbors(int myID, int expectedNeighborCount) {
-        return false;
-    }
+//    @Override
+//    boolean hasXOtherNeighbors(int myID, int expectedNeighborCount) {
+//        return false;
+//    }
 
     @Override
     public String toString() {

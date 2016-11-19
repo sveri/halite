@@ -1,6 +1,5 @@
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,7 +65,7 @@ class Piece {
 
 
 //    Direction findNextDirectionForClosestPiece() {
-//        Direction direction = gameMap.getFromPieceToPiece(this, MyBot.nextPieceToConquer);
+//        Direction direction = gameMap.getFromPieceToPiece(this, Seventeenth.nextPieceToConquer);
 //        Piece pieceTo = Piece.fromLocationAndDirection(getLoc(), direction, gameMap);
 //
 //        if(pieceTo.getStrength() < getStrength())
@@ -110,13 +109,13 @@ class Piece {
 //        }
 //
 //
-////        int nextPieceToConquerOwner = gameMap.getSite(MyBot.nextPieceToConquer.getLoc()).owner;
+////        int nextPieceToConquerOwner = gameMap.getSite(Seventeenth.nextPieceToConquer.getLoc()).owner;
 //
 ////        if (nextPieceToConquerOwner != myID && moveAccordingToOwnStrength()) {
 ////
-////            Piece nextPiece = Piece.fromLocationAndDirection(getLoc(), gameMap.getFromPieceToPiece(this, MyBot.nextPieceToConquer), gameMap);
+////            Piece nextPiece = Piece.fromLocationAndDirection(getLoc(), gameMap.getFromPieceToPiece(this, Seventeenth.nextPieceToConquer), gameMap);
 ////            if (nextPiece.getStrength() < getStrength())
-////                retDirection = gameMap.getFromPieceToPiece(this, MyBot.nextPieceToConquer);
+////                retDirection = gameMap.getFromPieceToPiece(this, Seventeenth.nextPieceToConquer);
 ////        } else
 //
 ////        if (hasOnlyOwnNeighbors(myID)) {
@@ -190,7 +189,7 @@ class Piece {
     private List<Piece> getNpcNeighbors() {
         return Arrays.stream(Direction.CARDINALS)
                 .map(direction -> Piece.fromLocationAndDirection(getLoc(), direction, gameMap))
-                .filter(piece -> piece.getOwner() == MyBot.npcID).collect(Collectors.toList());
+                .filter(piece -> piece.getOwner() == Seventeenth.npcID).collect(Collectors.toList());
     }
 
     private List<Piece> getAllNonOwnNeighbors(int myID) {
@@ -409,7 +408,7 @@ class Piece {
     }
 
     boolean isNpc() {
-        return getOwner() == MyBot.npcID;
+        return getOwner() == Seventeenth.npcID;
     }
 
     boolean isEnemy(int myID) {

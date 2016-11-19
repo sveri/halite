@@ -33,7 +33,7 @@ javac -d ../bin/mybot MyBot.java
 cd ..
 
 
-halite -q -d "35 35" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/eleventh/ Eleventh" "java -cp .:bin/v16/ Sixteenth"
+halite -q -d "35 35" "java -cp .:bin/mybot/ MyBot" "java -cp .:bin/v17/ Seventeenth" "java -cp .:bin/v16/ Sixteenth"
 
 
 
