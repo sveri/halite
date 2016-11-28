@@ -5,3 +5,7 @@
 *.hlt
 *.swp
 bin/
+*.log
+.classpath
+.project
+.settings/

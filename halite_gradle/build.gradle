@@ -1,0 +1,86 @@
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+//    maven { url "http://neuroph.sourceforge.net/maven2/"}
+//    maven {
+//        url "https://oss.sonatype.org/content/repositories/snapshots"
+//        }
+//    maven {url "http://oss.sonatype.org/service/local/staging/deploy/maven2/" }
+
+}
+
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
+
+    }
+}
+
+
+apply plugin: 'com.github.johnrengelman.shadow'
+
+configurations {
+    all*.exclude group: 'org.bytedeco', module: 'javacpp-presets'
+}
+
+dependencies {
+    compile group: 'commons-logging', name: 'commons-logging', version: '1.2'
+//    compile group: 'edu.brown.cs.burlap', name: 'burlap', version: '3.0.1'
+//    compile group: 'org.deeplearning4j', name: 'rl4j-core', version: '0.6.0'
+//    compile group: 'org.encog', name: 'encog-core', version: '3.3.0'
+
+//    compile group: 'org.neuroph', name: 'neuroph-core', version: '2.9'
+//    compile group: 'org.deeplearning4j', name: 'deeplearning4j-nn', version: '0.6.0'
+//    compile group: 'org.deeplearning4j', name: 'deeplearning4j-core', version: '0.6.0'
+//    compile group: 'org.nd4j', name: 'nd4j-native-platform', version: '0.6.0'
+}
+
+
+shadowJar {
+    baseName = 'MyBot'
+    classifier = null
+    version = null
+}
+
+mainClassName = 'MyBot'
+
+
+//task mybot (type: JavaCompile) {
+//    source = sourceSets.main.java.srcDirs
+//    include 'MyBot.java'
+//    classpath = sourceSets.main.compileClasspath
+//    destinationDir = sourceSets.main.output.classesDir
+//}
+//
+//mybot.options.compilerArgs = ["-sourcepath", "$projectDir/src/main/java"]
+//mybot.outputs.upToDateWhen {false}
+//
+//task randomBot (type: JavaCompile) {
+//    source = sourceSets.main.java.srcDirs
+//    include 'RandomBot.java'
+//    classpath = sourceSets.main.compileClasspath
+//    destinationDir = sourceSets.main.output.classesDir
+//}
+//
+//randomBot.options.compilerArgs = ["-sourcepath", "$projectDir/src/main/java"]
+//randomBot.outputs.upToDateWhen {false}
+//
+//task firstBot (type: JavaCompile) {
+//    source = sourceSets.main.java.srcDirs
+//    include 'FirstBot.java'
+//    classpath = sourceSets.main.compileClasspath
+//    destinationDir = sourceSets.main.output.classesDir
+//}
+//
+//firstBot.options.compilerArgs = ["-sourcepath", "$projectDir/src/main/java"]
+//firstBot.outputs.upToDateWhen {false}
