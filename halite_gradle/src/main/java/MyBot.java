@@ -104,7 +104,8 @@ public class MyBot {
                 } else {
                     Integer curValue = dirToValue.get(dir);
                     curLoc = gameMap.getLocation(curLoc, dir);
-                    dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite, myID));
+                    dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
+                    + getNpcOwnEnemyValue(curSite, myID));
                 }
             }
 //            }
@@ -125,9 +126,13 @@ public class MyBot {
         return Piece.fromLocationAndDirection(own.getLocation(), gameMap, maxEntry.getKey());
     }
 
-    private static int getStrengthValue(Site curSite, int myID) {
-        if (curSite.owner == myID) return 10;
+    private static int getNpcOwnEnemyValue(Site curSite, int myID) {
+        if(curSite.owner == myID) return 0;
 
+        return 10;
+    }
+
+    private static int getStrengthValue(Site curSite) {
         if (curSite.strength > 240) return 0;
         if (curSite.strength > 210) return 1;
         if (curSite.strength > 190) return 2;
