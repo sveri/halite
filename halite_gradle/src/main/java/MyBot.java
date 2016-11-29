@@ -50,14 +50,16 @@ public class MyBot {
                 Direction pieceDirection = Direction.STILL;
 
                 if (own.hasOnlyOwnNeighbors()) {
+                    logger.info("own neighbors");
                     if (moveAccordingToOwnStrength(own)) {
                         Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
-                        for (Piece enemy : enemies) {
-                            pieceDirection = Direction.getDirectionFromTo(own.getLocation(), enemy.getLocation(), gameMap.height, gameMap.width);
+                        if (enemies.size() > 0) {
+                            pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemies.get(0).getLocation(), gameMap);
                         }
                     }
                 } else {
-                    Piece nextPiece = MoveValueCalculator.findMostValuablePiece(own, gameMap, myID);
+//                    Piece nextPiece = MoveValueCalculator.findMostValuablePiece(own, gameMap, myID);
+                    Piece nextPiece = findMostValuablePiece(own, gameMap, myID);
 
                     if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
                         pieceDirection = nextPiece.getDirection();
@@ -92,89 +94,88 @@ public class MyBot {
         }
     }
 
-//    private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID) {
-//
-////        long endTime = System.nanoTime() + 500000000;
-////        long endTime = System.nanoTime() + 100000000;
-//
-//        final int maxLookAhead = 100;
-//
-//        Map<Direction, Integer> dirToValue = new HashMap<>();
-//
-//        for (Direction dir : Direction.CARDINALS) {
-//            long endTime = System.nanoTime() + 100000000;
-//            dirToValue.put(dir, 0);
-//            Location curLoc = own.getLocation();
-////            int i = 0;
-////
-////            //            if (curSite.owner != myID) {
-////            while (System.nanoTime() < endTime && i < maxLookAhead) {
-////                logger.info(System.nanoTime() + " - " + endTime);
-////                Site curSite = gameMap.getSite(curLoc, dir);
-////                //                if (i == maxLookAhead - 1 && curSite.owner == myID) {
-////                //                    dirToValue.remove(dir);
-////                //                } else {
-////                Integer curValue = dirToValue.get(dir);
-////                curLoc = gameMap.getLocation(curLoc, dir);
-////                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
-////                        + getNpcOwnEnemyValue(curSite, myID));
-////                //                }
-////                i++;
-////            }
-//            //            }
-//        }
-//
-//        if (dirToValue.isEmpty()) {
-//            return NullPiece.newNullPiece();
-//        }
-//
-//        Map.Entry<Direction, Integer> maxEntry = null;
-//
-//        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
-//            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
-//                maxEntry = entry;
-//            }
-//        }
-//
-//        return Piece.fromLocationAndDirection(own.getLocation(), gameMap, maxEntry.getKey());
-//    }
+    private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID) {
 
-//    private static int getNpcOwnEnemyValue(Site curSite, int myID) {
-//        if (curSite.owner == myID) return 0;
+//        long endTime = System.nanoTime() + 500000000;
+//        long endTime = System.nanoTime() + 100000000;
+
+        final int maxLookAhead = 4;
+
+        Map<Direction, Integer> dirToValue = new HashMap<>();
+
+        for (Direction dir : Direction.CARDINALS) {
+            long endTime = System.nanoTime() + 100000000;
+            dirToValue.put(dir, 0);
+            Location curLoc = own.getLocation();
+            int i = 0;
 //
-//        return 10;
-//    }
-//
-//    private static int getStrengthValue(Site curSite) {
-//        if (curSite.strength > 240) return 0;
-//        if (curSite.strength > 210) return 1;
-//        if (curSite.strength > 190) return 2;
-//        if (curSite.strength > 170) return 3;
-//        if (curSite.strength > 150) return 4;
-//        if (curSite.strength > 130) return 5;
-//        if (curSite.strength > 110) return 6;
-//        if (curSite.strength > 90) return 7;
-//        if (curSite.strength > 70) return 8;
-//        if (curSite.strength > 60) return 9;
-//        if (curSite.strength > 50) return 10;
-//        if (curSite.strength > 40) return 11;
-//        if (curSite.strength > 30) return 12;
-//        if (curSite.strength > 20) return 13;
-//        if (curSite.strength > 10) return 13;
-//
-//        return 15;
-//    }
-//
-//    private static int getProductionValue(int production) {
-//        if (production < 3) return 2;
-//        if (production < 5) return 4;
-//        if (production < 7) return 6;
-//        if (production < 9) return 8;
-//        if (production < 11) return 10;
-//        if (production < 13) return 12;
-//        if (production < 15) return 14;
-//        return 16;
-//    }
+//            //            if (curSite.owner != myID) {
+            while (System.nanoTime() < endTime && i < maxLookAhead) {
+                Site curSite = gameMap.getSite(curLoc, dir);
+                //                if (i == maxLookAhead - 1 && curSite.owner == myID) {
+                //                    dirToValue.remove(dir);
+                //                } else {
+                Integer curValue = dirToValue.get(dir);
+                curLoc = gameMap.getLocation(curLoc, dir);
+                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
+                        + getNpcOwnEnemyValue(curSite, myID));
+                //                }
+                i++;
+            }
+            //            }
+        }
+
+        if (dirToValue.isEmpty()) {
+            return NullPiece.newNullPiece();
+        }
+
+        Map.Entry<Direction, Integer> maxEntry = null;
+
+        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
+            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+                maxEntry = entry;
+            }
+        }
+
+        return Piece.fromLocationAndDirection(own.getLocation(), gameMap, maxEntry.getKey());
+    }
+
+    private static int getNpcOwnEnemyValue(Site curSite, int myID) {
+        if (curSite.owner == myID) return 0;
+
+        return 10;
+    }
+
+    private static int getStrengthValue(Site curSite) {
+        if (curSite.strength > 240) return 0;
+        if (curSite.strength > 210) return 1;
+        if (curSite.strength > 190) return 2;
+        if (curSite.strength > 170) return 3;
+        if (curSite.strength > 150) return 4;
+        if (curSite.strength > 130) return 5;
+        if (curSite.strength > 110) return 6;
+        if (curSite.strength > 90) return 7;
+        if (curSite.strength > 70) return 8;
+        if (curSite.strength > 60) return 9;
+        if (curSite.strength > 50) return 10;
+        if (curSite.strength > 40) return 11;
+        if (curSite.strength > 30) return 12;
+        if (curSite.strength > 20) return 13;
+        if (curSite.strength > 10) return 13;
+
+        return 15;
+    }
+
+    private static int getProductionValue(int production) {
+        if (production < 3) return 2;
+        if (production < 5) return 4;
+        if (production < 7) return 6;
+        if (production < 9) return 8;
+        if (production < 11) return 10;
+        if (production < 13) return 12;
+        if (production < 15) return 14;
+        return 16;
+    }
 
 // convolutional neural network
 // small area around the thing to move
