@@ -1,7 +1,5 @@
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -12,7 +10,11 @@ public class MyBot {
 
     private static final String botName = "sveriJavaBot";
 
-    private static List<ProductionArea> productionAreas = Collections.emptyList();
+//    private static List<ProductionArea> productionAreas = Collections.emptyList();
+
+//    private static final Map<Location, Location> movedFromTo = new HashMap<>();
+    private static final Map<Location, Location> movedToFrom = new HashMap<>();
+
 
 
     public static void main(String[] args) throws IOException {
@@ -38,18 +40,43 @@ public class MyBot {
 
             collectGameMapPieces(myID, gameMap, owns, npcs, enemies);
 
-            productionAreas = ProductionArea.collectProductionAreas(gameMap, productionAreas);
+//            productionAreas = ProductionArea.collectProductionAreas(gameMap, productionAreas);
 
             for (Piece own : owns) {
                 Direction pieceDirection = Direction.STILL;
 
-                Piece nextPiece = ProductionArea.getNextHighestProductionPiece(own, productionAreas, gameMap);
+                if (own.hasOnlyOwnNeighbors()) {
+                    if (moveAccordingToOwnStrength(own)) {
+                        Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
+                        for (Piece enemy : enemies) {
+                            pieceDirection  = Direction.getDirectionFromTo(own.getLocation(), enemy.getLocation(), gameMap.height, gameMap.width);
+                        }
+                    }
+                } else {
+                    Piece nextPiece = findMostValuableDirection(own, gameMap, myID);
 
-                if (nextPiece != null) {
-                    Direction possibleNextDirection = Direction.getDirectionFromTo(own.getLocation(), nextPiece.getLocation(), gameMap.height, gameMap.width);
-                    Piece possibleNextPiece = Piece.fromLocationAndDirection(own.getLocation(), gameMap, possibleNextDirection);
-                    if(possibleNextPiece.getStrength() < own.getStrength())
-                        pieceDirection = possibleNextDirection;
+                    if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
+                        pieceDirection = nextPiece.getDirection();
+                    }
+
+                }
+
+                if (pieceDirection != Direction.STILL) {
+                    Location fromLoc = own.getLocation();
+                    Location toLoc = gameMap.getLocation(own.getLocation(), pieceDirection);
+
+                    if (movedToFrom.containsKey(fromLoc) && movedToFrom.get(fromLoc).equals(toLoc)) {
+//                        Location oldFrom = movedToFrom.get(fromLoc);
+//                        if (oldFrom.equals(toLoc)) {
+                            pieceDirection = Direction.randomDirection();
+                            movedToFrom.put(gameMap.getLocation(own.getLocation(), pieceDirection), fromLoc);
+//                        }
+                    } else {
+                        movedToFrom.put(toLoc, fromLoc);
+                    }
+
+//                    if(movedFromTo.get(toLoc).equals(fromLoc) && )
+//                    movedFromTo.put(fromLoc, toLoc);
                 }
 
                 moves.add(new Move(own.getLocation(), pieceDirection));
@@ -58,6 +85,77 @@ public class MyBot {
 
             Networking.sendFrame(moves);
         }
+    }
+
+    private static Piece findMostValuableDirection(Piece own, GameMap gameMap, int myID) {
+
+        final int maxLookAhead = 4;
+
+        Map<Direction, Integer> dirToValue = new HashMap<>();
+        for (Direction dir : Direction.CARDINALS) {
+            dirToValue.put(dir, 0);
+            Location curLoc = own.getLocation();
+
+//            if (curSite.owner != myID) {
+            for (int i = 0; i < maxLookAhead; i++) {
+                Site curSite = gameMap.getSite(curLoc, dir);
+                if (i == maxLookAhead - 1 && curSite.owner == myID) {
+                    dirToValue.remove(dir);
+                } else {
+                    Integer curValue = dirToValue.get(dir);
+                    curLoc = gameMap.getLocation(curLoc, dir);
+                    dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite, myID));
+                }
+            }
+//            }
+        }
+
+        if (dirToValue.isEmpty()) {
+            return NullPiece.newNullPiece();
+        }
+
+        Map.Entry<Direction, Integer> maxEntry = null;
+
+        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
+            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+                maxEntry = entry;
+            }
+        }
+
+        return Piece.fromLocationAndDirection(own.getLocation(), gameMap, maxEntry.getKey());
+    }
+
+    private static int getStrengthValue(Site curSite, int myID) {
+        if (curSite.owner == myID) return 10;
+
+        if (curSite.strength > 240) return 0;
+        if (curSite.strength > 210) return 1;
+        if (curSite.strength > 190) return 2;
+        if (curSite.strength > 170) return 3;
+        if (curSite.strength > 150) return 4;
+        if (curSite.strength > 130) return 5;
+        if (curSite.strength > 110) return 6;
+        if (curSite.strength > 90) return 7;
+        if (curSite.strength > 70) return 8;
+        if (curSite.strength > 60) return 9;
+        if (curSite.strength > 50) return 10;
+        if (curSite.strength > 40) return 11;
+        if (curSite.strength > 30) return 12;
+        if (curSite.strength > 20) return 13;
+        if (curSite.strength > 10) return 13;
+
+        return 15;
+    }
+
+    private static int getProductionValue(int production) {
+        if (production < 3) return 2;
+        if (production < 5) return 4;
+        if (production < 7) return 6;
+        if (production < 9) return 8;
+        if (production < 11) return 10;
+        if (production < 13) return 12;
+        if (production < 15) return 14;
+        return 16;
     }
 
 // convolutional neural network
@@ -123,6 +221,15 @@ public class MyBot {
 }
 
 
+// finding highest production rank, need something different I guess
+//                Piece nextPiece = ProductionArea.getNextHighestProductionPiece(own, productionAreas, gameMap);
+//
+//                if (nextPiece != null) {
+//                    Direction possibleNextDirection = Direction.getDirectionFromTo(own.getLocation(), nextPiece.getLocation(), gameMap.height, gameMap.width);
+//                    Piece possibleNextPiece = Piece.fromLocationAndDirection(own.getLocation(), gameMap, possibleNextDirection);
+//                    if(possibleNextPiece.getStrength() < own.getStrength())
+//                        pieceDirection = possibleNextDirection;
+//                }
 
 
 // trying to omit pieces that are worth nothing - did not work yet

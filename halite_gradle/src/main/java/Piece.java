@@ -11,6 +11,7 @@ public class Piece {
     private final Location loc;
     private final GameMap gameMap;
     private final int owner;
+    private final Direction direction;
     private final Site site;
 //    private List<Piece> ownNeighbors;
 
@@ -19,23 +20,25 @@ public class Piece {
         site = null;
         loc = null;
         gameMap = null;
+        direction = null;
     }
 
-    private Piece(Location loc, GameMap gameMap, int id) {
+    private Piece(Location loc, GameMap gameMap, int id, Direction direction) {
         this.loc = loc;
         this.gameMap = gameMap;
         this.owner = id;
+        this.direction = direction;
         this.site = gameMap.getSite(loc);
     }
 
     public static Piece fromLocation(Location loc, GameMap gameMap, int id) {
-        return new Piece(loc, gameMap, id);
+        return new Piece(loc, gameMap, id, null);
     }
 
     public static Piece fromLocationAndDirection(Location loc, GameMap gameMap, Direction direction) {
         Location newLocation = gameMap.getLocation(loc, direction);
         Site newSite = gameMap.getSite(newLocation);
-        return new Piece(newLocation, gameMap, newSite.owner);
+        return new Piece(newLocation, gameMap, newSite.owner, direction);
     }
 
     public boolean hasOnlyOwnNeighbors() {
@@ -116,5 +119,9 @@ public class Piece {
 
     public boolean isNull() {
         return false;
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
 }

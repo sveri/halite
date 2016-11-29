@@ -6,14 +6,15 @@ gradle shadowJar
 rm *.hlt
 rm *.log
 rm *.lck
+rm *.zip
 
-halite -t -d "30 30" "java -jar build/libs/MyBot.jar" "python3 ../Halite-Python-Starter-Package/MyBot.py"
+halite -t -d "20 20" "java -jar build/libs/MyBot.jar" "python3 ../../Halite-Python-Starter-Package/MyBot.py"
 #halite -d "30 30" "java MyBot" "java FirstBot" "java RandomBot"
 
 
 
 
-
+zip MyBot.zip build/libs/MyBot.jar
 
 
 

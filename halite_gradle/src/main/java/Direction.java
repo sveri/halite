@@ -54,4 +54,18 @@ enum Direction {
             return Direction.EAST;
         }
     }
+
+    public static Direction getOppositeDirection(Direction pieceDirection) {
+        switch (pieceDirection) {
+            case EAST: return WEST;
+            case SOUTH:
+                return NORTH;
+            case WEST:
+                return EAST;
+            case NORTH:
+                return SOUTH;
+            default:
+                return STILL;
+        }
+    }
 }
