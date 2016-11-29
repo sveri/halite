@@ -29,6 +29,10 @@ enum Direction {
         return fromInteger(new Random().nextInt(5));
     }
 
+    static Direction getDirectionFromToGameMap(Location from, Location to, GameMap gameMap) {
+        return getDirectionFromTo(from, to, gameMap.height, gameMap.width);
+    }
+
     static Direction getDirectionFromTo(Location from, Location to, int heigth, int width) {
         // need to move on y line
         if(from.x == to.x) {

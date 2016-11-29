@@ -48,16 +48,11 @@ public class ProductionAreaTest {
         List<ProductionArea> productionAreas = Collections.emptyList();
         productionAreas = ProductionArea.collectProductionAreas(gameMap, productionAreas);
 
-        ProductionArea productionArea = ProductionArea.fromLocation(new Location(0, 0), gameMap);
-        Piece nextHighestProductionPiece = ProductionArea.getNextHighestProductionPiece(Piece.fromLocation(new Location(0, 0), gameMap, 1), productionAreas, gameMap);
-
-
-//        productionArea.
-//                Assert.assertEquals(1, productionArea.getMeanProduction());
+//        ProductionArea productionArea = ProductionArea.fromLocation(new Location(0, 0), gameMap);
+//        Piece nextHighestProductionPiece = ProductionArea.getNextHighestProductionPiece(Piece.fromLocation(new Location(0, 0), gameMap, 1), productionAreas, gameMap);
 //
-//        productionArea = ProductionArea.fromLocation(new Location(4, 1), gameMap);
-        Assert.assertEquals(4, nextHighestProductionPiece.getLocation().x);
-        Assert.assertEquals(1, nextHighestProductionPiece.getLocation().y);
+//        Assert.assertEquals(4, nextHighestProductionPiece.getLocation().x);
+//        Assert.assertEquals(1, nextHighestProductionPiece.getLocation().y);
     }
 
 

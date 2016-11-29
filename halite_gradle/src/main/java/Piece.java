@@ -124,4 +124,31 @@ public class Piece {
     public Direction getDirection() {
         return direction;
     }
+
+    @Override
+    public String toString() {
+        return "Piece{" +
+                "loc=" + loc +
+                ", owner=" + owner +
+//                ", site=" + site +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Piece piece = (Piece) o;
+
+        if (owner != piece.owner) return false;
+        return loc.equals(piece.loc);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = loc.hashCode();
+        result = 31 * result + owner;
+        return result;
+    }
 }
