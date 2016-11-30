@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot23";
+    private static final String botName = "sveriJavaBot25";
 
     static final Logger logger = new Logger(botName);
 
@@ -42,8 +42,8 @@ public class MyBot {
             for (Piece own : owns) {
                 Direction pieceDirection = Direction.STILL;
 
-                if (own.hasEnemyNeighbor()) {
-                    Piece mostEnemies = own.findPieceWithMostEnemyNeighbors();
+                if (own.hasEnemyNeighbor(myID)) {
+                    Piece mostEnemies = own.findPieceWithMostEnemyNeighbors(myID);
                     pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), mostEnemies.getLocation(), gameMap);
 
                 } else if (own.hasOnlyOwnNeighbors()) {

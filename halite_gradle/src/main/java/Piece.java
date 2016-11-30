@@ -57,16 +57,16 @@ public class Piece {
         return neighbors;
     }
 
-    public boolean hasEnemyNeighbor() {
+    public boolean hasEnemyNeighbor(int myID) {
         for (Direction direction : Direction.CARDINALS) {
-            if (gameMap.getSite(this.loc, direction).owner > 1) {
+            if (gameMap.getSite(this.loc, direction).owner != 0 && gameMap.getSite(this.loc, direction).owner != myID) {
                 return true;
             }
         }
         return false;
     }
 
-    public Piece findPieceWithMostEnemyNeighbors() {
+    public Piece findPieceWithMostEnemyNeighbors(int myID) {
         Adder adder = new Adder(gameMap.width, gameMap.height);
         Map<Direction, Integer> dirToEnemies = new HashMap<>();
 
@@ -75,32 +75,32 @@ public class Piece {
         }
 
         Site site = gameMap.getSite(new Location(adder.addX(getLocation().x, 0), adder.subY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.NORTH);
+        incEnemiesCount(dirToEnemies, site, Direction.NORTH, myID);
         site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.NORTH);
+        incEnemiesCount(dirToEnemies, site, Direction.NORTH, myID);
         site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.NORTH);
+        incEnemiesCount(dirToEnemies, site, Direction.NORTH, myID);
 
         site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.subY(getLocation().y, 0)));
-        incEnemiesCount(dirToEnemies, site, Direction.EAST);
+        incEnemiesCount(dirToEnemies, site, Direction.EAST, myID);
         site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.EAST);
+        incEnemiesCount(dirToEnemies, site, Direction.EAST, myID);
         site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.EAST);
+        incEnemiesCount(dirToEnemies, site, Direction.EAST, myID);
 
         site = gameMap.getSite(new Location(adder.addX(getLocation().x, 0), adder.addY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.SOUTH);
+        incEnemiesCount(dirToEnemies, site, Direction.SOUTH, myID);
         site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.SOUTH);
+        incEnemiesCount(dirToEnemies, site, Direction.SOUTH, myID);
         site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.SOUTH);
+        incEnemiesCount(dirToEnemies, site, Direction.SOUTH, myID);
 
         site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.subY(getLocation().y, 0)));
-        incEnemiesCount(dirToEnemies, site, Direction.WEST);
+        incEnemiesCount(dirToEnemies, site, Direction.WEST, myID);
         site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.WEST);
+        incEnemiesCount(dirToEnemies, site, Direction.WEST, myID);
         site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
-        incEnemiesCount(dirToEnemies, site, Direction.WEST);
+        incEnemiesCount(dirToEnemies, site, Direction.WEST, myID);
 
 
         if (dirToEnemies.isEmpty()) {
@@ -118,8 +118,8 @@ public class Piece {
         return Piece.fromLocationAndDirection(getLocation(), gameMap, maxEntry.getKey());
     }
 
-    private void incEnemiesCount(Map<Direction, Integer> m, Site site, Direction dir) {
-        if (site.owner > 1) {
+    private void incEnemiesCount(Map<Direction, Integer> m, Site site, Direction dir, int myID) {
+        if (site.owner != 0 && site.owner != myID) {
             Integer count = m.get(dir);
             m.put(dir,  count += 1);
         }

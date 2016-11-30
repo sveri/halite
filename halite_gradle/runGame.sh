@@ -11,9 +11,6 @@ rm *.zip
 halite -d "20 20" "java -jar build/libs/MyBot.jar" "java -jar MyBot22.jar"
 #halite -d "30 30" "java MyBot" "java FirstBot" "java RandomBot"
 
-
-
-
 zip MyBot.zip build/libs/MyBot.jar
 
 
