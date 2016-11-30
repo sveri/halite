@@ -8,12 +8,7 @@ import java.util.*;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot";
-
-//    private static List<ProductionArea> productionAreas = Collections.emptyList();
-
-//    private static final Map<Location, Location> movedFromTo = new HashMap<>();
-//    private static final Map<Location, Location> movedToFrom = new HashMap<>();
+    private static final String botName = "sveriJavaBot23";
 
     static final Logger logger = new Logger(botName);
 
@@ -44,12 +39,14 @@ public class MyBot {
 
             collectGameMapPieces(myID, gameMap, owns, npcs, enemies);
 
-//            productionAreas = ProductionArea.collectProductionAreas(gameMap, productionAreas);
-
             for (Piece own : owns) {
                 Direction pieceDirection = Direction.STILL;
 
-                if (own.hasOnlyOwnNeighbors()) {
+                if (own.hasEnemyNeighbor()) {
+                    Piece mostEnemies = own.findPieceWithMostEnemyNeighbors();
+                    pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), mostEnemies.getLocation(), gameMap);
+
+                } else if (own.hasOnlyOwnNeighbors()) {
                     logger.info("own neighbors");
                     if (moveAccordingToOwnStrength(own)) {
                         Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
@@ -58,7 +55,6 @@ public class MyBot {
                         }
                     }
                 } else {
-//                    Piece nextPiece = MoveValueCalculator.findMostValuablePiece(own, gameMap, myID);
                     Piece nextPiece = findMostValuablePiece(own, gameMap, myID);
 
                     if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
@@ -66,24 +62,6 @@ public class MyBot {
                     }
 
                 }
-
-//                if (pieceDirection != Direction.STILL) {
-//                    Location fromLoc = own.getLocation();
-//                    Location toLoc = gameMap.getLocation(own.getLocation(), pieceDirection);
-//
-////                    if (movedToFrom.containsKey(fromLoc) && movedToFrom.get(fromLoc).equals(toLoc)) {
-//////                        Location oldFrom = movedToFrom.get(fromLoc);
-//////                        if (oldFrom.equals(toLoc)) {
-////                            pieceDirection = Direction.randomDirection();
-////                            movedToFrom.put(gameMap.getLocation(own.getLocation(), pieceDirection), fromLoc);
-//////                        }
-////                    } else {
-////                        movedToFrom.put(toLoc, fromLoc);
-////                    }
-//
-////                    if(movedFromTo.get(toLoc).equals(fromLoc) && )
-////                    movedFromTo.put(fromLoc, toLoc);
-//                }
 
                 moves.add(new Move(own.getLocation(), pieceDirection));
             }
@@ -96,9 +74,6 @@ public class MyBot {
 
     private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID) {
 
-//        long endTime = System.nanoTime() + 500000000;
-//        long endTime = System.nanoTime() + 100000000;
-
         final int maxLookAhead = 4;
 
         Map<Direction, Integer> dirToValue = new HashMap<>();
@@ -108,21 +83,15 @@ public class MyBot {
             dirToValue.put(dir, 0);
             Location curLoc = own.getLocation();
             int i = 0;
-//
-//            //            if (curSite.owner != myID) {
+
             while (System.nanoTime() < endTime && i < maxLookAhead) {
                 Site curSite = gameMap.getSite(curLoc, dir);
-                //                if (i == maxLookAhead - 1 && curSite.owner == myID) {
-                //                    dirToValue.remove(dir);
-                //                } else {
                 Integer curValue = dirToValue.get(dir);
                 curLoc = gameMap.getLocation(curLoc, dir);
                 dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
                         + getNpcOwnEnemyValue(curSite, myID));
-                //                }
                 i++;
             }
-            //            }
         }
 
         if (dirToValue.isEmpty()) {
@@ -238,38 +207,3 @@ public class MyBot {
 
 
 }
-
-
-// finding highest production rank, need something different I guess
-//                Piece nextPiece = ProductionArea.getNextHighestProductionPiece(own, productionAreas, gameMap);
-//
-//                if (nextPiece != null) {
-//                    Direction possibleNextDirection = Direction.getDirectionFromTo(own.getLocation(), nextPiece.getLocation(), gameMap.height, gameMap.width);
-//                    Piece possibleNextPiece = Piece.fromLocationAndDirection(own.getLocation(), gameMap, possibleNextDirection);
-//                    if(possibleNextPiece.getStrength() < own.getStrength())
-//                        pieceDirection = possibleNextDirection;
-//                }
-
-
-// trying to omit pieces that are worth nothing - did not work yet
-//                if (own.hasOnlyOwnNeighbors()) {
-//                    if (moveAccordingToOwnStrength(own)) {
-//                        Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
-//                        for (Piece enemy : enemies) {
-//                            Direction toEnemy = Direction.getDirectionFromTo(own.getLocation(), enemy.getLocation(), gameMap.height, gameMap.width);
-//                            Piece toEnemyPiece = Piece.fromLocationAndDirection(own.getLocation(), gameMap, toEnemy);
-//                            if (toEnemyPiece.isOwnMoveablePiece(owns)) {
-//                                pieceDirection = Direction.getDirectionFromTo(own.getLocation(), enemy.getLocation(), gameMap.height, gameMap.width);
-//                                break;
-//                            }
-//                        }
-//                    }
-//                } else {
-//                    Piece bestNonOwnNeighbor = own.getBestNonOwnNeighbor(owns);
-////                    if(bestNonOwnNeighbor.isNull()) {
-////                        List<Piece> ownNeighbors = own.getOwnNeighbors();
-////                    }
-//                    if (!bestNonOwnNeighbor.isNull() && bestNonOwnNeighbor.getStrength() < own.getStrength()) {
-//                        pieceDirection = Direction.getDirectionFromTo(own.getLocation(), bestNonOwnNeighbor.getLocation(), gameMap.height, gameMap.width);
-//                    }
-//                }

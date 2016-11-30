@@ -1,7 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by sveri on 25.11.16.
@@ -58,6 +55,74 @@ public class Piece {
                 neighbors.add(neighborPiece);
         }
         return neighbors;
+    }
+
+    public boolean hasEnemyNeighbor() {
+        for (Direction direction : Direction.CARDINALS) {
+            if (gameMap.getSite(this.loc, direction).owner > 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Piece findPieceWithMostEnemyNeighbors() {
+        Adder adder = new Adder(gameMap.width, gameMap.height);
+        Map<Direction, Integer> dirToEnemies = new HashMap<>();
+
+        for (Direction dir : Direction.CARDINALS) {
+            dirToEnemies.put(dir, 0);
+        }
+
+        Site site = gameMap.getSite(new Location(adder.addX(getLocation().x, 0), adder.subY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.NORTH);
+        site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.NORTH);
+        site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.NORTH);
+
+        site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.subY(getLocation().y, 0)));
+        incEnemiesCount(dirToEnemies, site, Direction.EAST);
+        site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.EAST);
+        site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.EAST);
+
+        site = gameMap.getSite(new Location(adder.addX(getLocation().x, 0), adder.addY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.SOUTH);
+        site = gameMap.getSite(new Location(adder.addX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.SOUTH);
+        site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.SOUTH);
+
+        site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.subY(getLocation().y, 0)));
+        incEnemiesCount(dirToEnemies, site, Direction.WEST);
+        site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.subY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.WEST);
+        site = gameMap.getSite(new Location(adder.subX(getLocation().x, 1), adder.addY(getLocation().y, 1)));
+        incEnemiesCount(dirToEnemies, site, Direction.WEST);
+
+
+        if (dirToEnemies.isEmpty()) {
+            return NullPiece.newNullPiece();
+        }
+
+        Map.Entry<Direction, Integer> maxEntry = null;
+
+        for (Map.Entry<Direction, Integer> entry : dirToEnemies.entrySet()) {
+            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+                maxEntry = entry;
+            }
+        }
+
+        return Piece.fromLocationAndDirection(getLocation(), gameMap, maxEntry.getKey());
+    }
+
+    private void incEnemiesCount(Map<Direction, Integer> m, Site site, Direction dir) {
+        if (site.owner > 1) {
+            Integer count = m.get(dir);
+            m.put(dir,  count += 1);
+        }
     }
 
     Piece getBestNonOwnNeighbor(List<Piece> ownPieces) {
