@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -8,7 +9,7 @@ import java.util.*;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot";
+    private static final String botName = "sveriJavaBot23_1";
 
 //    private static List<ProductionArea> productionAreas = Collections.emptyList();
 
@@ -44,8 +45,6 @@ public class MyBot {
 
             collectGameMapPieces(myID, gameMap, owns, npcs, enemies);
 
-//            productionAreas = ProductionArea.collectProductionAreas(gameMap, productionAreas);
-
             for (Piece own : owns) {
                 Direction pieceDirection = Direction.STILL;
 
@@ -58,7 +57,6 @@ public class MyBot {
                         }
                     }
                 } else {
-//                    Piece nextPiece = MoveValueCalculator.findMostValuablePiece(own, gameMap, myID);
                     Piece nextPiece = findMostValuablePiece(own, gameMap, myID);
 
                     if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
@@ -66,24 +64,6 @@ public class MyBot {
                     }
 
                 }
-
-//                if (pieceDirection != Direction.STILL) {
-//                    Location fromLoc = own.getLocation();
-//                    Location toLoc = gameMap.getLocation(own.getLocation(), pieceDirection);
-//
-////                    if (movedToFrom.containsKey(fromLoc) && movedToFrom.get(fromLoc).equals(toLoc)) {
-//////                        Location oldFrom = movedToFrom.get(fromLoc);
-//////                        if (oldFrom.equals(toLoc)) {
-////                            pieceDirection = Direction.randomDirection();
-////                            movedToFrom.put(gameMap.getLocation(own.getLocation(), pieceDirection), fromLoc);
-//////                        }
-////                    } else {
-////                        movedToFrom.put(toLoc, fromLoc);
-////                    }
-//
-////                    if(movedFromTo.get(toLoc).equals(fromLoc) && )
-////                    movedFromTo.put(fromLoc, toLoc);
-//                }
 
                 moves.add(new Move(own.getLocation(), pieceDirection));
             }
@@ -96,54 +76,91 @@ public class MyBot {
 
     private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID) {
 
-//        long endTime = System.nanoTime() + 500000000;
+        long endTime = System.nanoTime() + 500000000;
 //        long endTime = System.nanoTime() + 100000000;
 
-        final int maxLookAhead = 4;
+        final int maxLookAhead = 10;
 
-        Map<Direction, Integer> dirToValue = new HashMap<>();
+//        Map<Direction, Integer> dirToValue = new HashMap<>();
+        Set<DirectionAndDistanceValue> directionAndDistanceValues = new HashSet<>();
 
         for (Direction dir : Direction.CARDINALS) {
-            long endTime = System.nanoTime() + 100000000;
-            dirToValue.put(dir, 0);
-            Location curLoc = own.getLocation();
-            int i = 0;
-//
-//            //            if (curSite.owner != myID) {
+//            dirToValue.put(dir, 0);
+
+            int i = 1;
+
             while (System.nanoTime() < endTime && i < maxLookAhead) {
-                Site curSite = gameMap.getSite(curLoc, dir);
-                //                if (i == maxLookAhead - 1 && curSite.owner == myID) {
-                //                    dirToValue.remove(dir);
-                //                } else {
-                Integer curValue = dirToValue.get(dir);
-                curLoc = gameMap.getLocation(curLoc, dir);
-                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
-                        + getNpcOwnEnemyValue(curSite, myID));
-                //                }
+                int curValue = 0;
+                Location curLoc = own.getLocation();
+                int curDistance = 0;
+
+                for (int j = 0; j < i; j++) {
+
+                    Site curSite = gameMap.getSite(curLoc, dir);
+//                    Integer curValue = dirToValue.get(dir);
+                    curLoc = gameMap.getLocation(curLoc, dir);
+//                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
+//                        + getNpcOwnEnemyValue(curSite, myID));
+                    curDistance = (int) gameMap.getDistance(own.getLocation(), curLoc);
+                    curValue += (getProductionValue(curSite.production) + getStrengthValue(curSite) + getNpcOwnEnemyValue(curSite, myID))
+                            / Math.pow(10, j);
+
+//                        + getDistanceValue(curDistance);
+                    directionAndDistanceValues.add(new DirectionAndDistanceValue(dir, curValue, curDistance));
+
+                }
+
                 i++;
             }
-            //            }
+
+//            while (System.nanoTime() < endTime && i < maxLookAhead) {
+//                Site curSite = gameMap.getSite(curLoc, dir);
+//                Integer curValue = dirToValue.get(dir);
+//                curLoc = gameMap.getLocation(curLoc, dir);
+//                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
+//                        + getNpcOwnEnemyValue(curSite, myID));
+//                i++;
+//            }
         }
 
-        if (dirToValue.isEmpty()) {
+        if (directionAndDistanceValues.isEmpty()) {
             return NullPiece.newNullPiece();
         }
 
-        Map.Entry<Direction, Integer> maxEntry = null;
+        List<DirectionAndDistanceValue> distanceValuesSortedByLowValueFirst =
+                directionAndDistanceValues.stream().sorted(DirectionAndDistanceValue::compareTo).collect(Collectors.toList());
+        Collections.reverse(distanceValuesSortedByLowValueFirst);
+        logger.info(distanceValuesSortedByLowValueFirst.subList(0, 4).toString());
+//        Map.Entry<Direction, Integer> maxEntry = null;
+//
+//        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
+//            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+//                maxEntry = entry;
+//            }
+//        }
 
-        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
-            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
-                maxEntry = entry;
-            }
-        }
-
-        return Piece.fromLocationAndDirection(own.getLocation(), gameMap, maxEntry.getKey());
+        DirectionAndDistanceValue max = directionAndDistanceValues.stream().max(DirectionAndDistanceValue::compareTo).get();
+        logger.info("max: " + directionAndDistanceValues.stream().max(DirectionAndDistanceValue::compareTo).get());
+        return Piece.fromLocationAndDirection(own.getLocation(), gameMap, max.getDirection());
     }
+
+//    private static int getDistanceValue(int distance) {
+//        if(distance == 1) return 90;
+//        if(distance == 2) return 80;
+//        if(distance == 3) return 70;
+//        if(distance == 4) return 60;
+//        if(distance == 5) return 40;
+//        if(distance == 7) return 30;
+//        if(distance == 8) return 20;
+//        if(distance == 9) return 5;
+//
+//        return 1;
+//    }
 
     private static int getNpcOwnEnemyValue(Site curSite, int myID) {
         if (curSite.owner == myID) return 0;
 
-        return 10;
+        return 20;
     }
 
     private static int getStrengthValue(Site curSite) {
@@ -161,20 +178,22 @@ public class MyBot {
         if (curSite.strength > 40) return 11;
         if (curSite.strength > 30) return 12;
         if (curSite.strength > 20) return 13;
-        if (curSite.strength > 10) return 13;
+        if (curSite.strength > 10) return 14;
 
         return 15;
     }
 
     private static int getProductionValue(int production) {
-        if (production < 3) return 2;
-        if (production < 5) return 4;
-        if (production < 7) return 6;
-        if (production < 9) return 8;
-        if (production < 11) return 10;
-        if (production < 13) return 12;
-        if (production < 15) return 14;
-        return 16;
+        if (production < 1) return 0;
+        if (production < 2) return 2;
+        if (production < 3) return 4;
+        if (production < 5) return 6;
+        if (production < 7) return 8;
+        if (production < 9) return 10;
+        if (production < 11) return 12;
+        if (production < 13) return 14;
+        if (production < 15) return 16;
+        return 18;
     }
 
 // convolutional neural network
@@ -206,19 +225,19 @@ public class MyBot {
                 || p.getProduction() == 1 && p.getStrength() > 2)
                 || (p.getProduction() == 2 && p.getStrength() > 5)
                 || (p.getProduction() == 3 && p.getStrength() > 10)
-                || (p.getProduction() == 4 && p.getStrength() > 20)
-                || (p.getProduction() == 5 && p.getStrength() > 30)
-                || (p.getProduction() == 6 && p.getStrength() > 40)
-                || (p.getProduction() == 7 && p.getStrength() > 50)
-                || (p.getProduction() == 8 && p.getStrength() > 60)
-                || (p.getProduction() == 9 && p.getStrength() > 65)
-                || (p.getProduction() == 10 && p.getStrength() > 70)
-                || (p.getProduction() == 11 && p.getStrength() > 75)
-                || (p.getProduction() == 12 && p.getStrength() > 80)
-                || (p.getProduction() == 13 && p.getStrength() > 90)
-                || (p.getProduction() == 14 && p.getStrength() > 100)
-                || (p.getProduction() == 15 && p.getStrength() > 105)
-                || (p.getProduction() == 16 && p.getStrength() > 110);
+                || (p.getProduction() == 4 && p.getStrength() > 15)
+                || (p.getProduction() == 5 && p.getStrength() > 20)
+                || (p.getProduction() == 6 && p.getStrength() > 25)
+                || (p.getProduction() == 7 && p.getStrength() > 30)
+                || (p.getProduction() == 8 && p.getStrength() > 35)
+                || (p.getProduction() == 9 && p.getStrength() > 40)
+                || (p.getProduction() == 10 && p.getStrength() > 45)
+                || (p.getProduction() == 11 && p.getStrength() > 50)
+                || (p.getProduction() == 12 && p.getStrength() > 60)
+                || (p.getProduction() == 13 && p.getStrength() > 70)
+                || (p.getProduction() == 14 && p.getStrength() > 80)
+                || (p.getProduction() == 15 && p.getStrength() > 90)
+                || (p.getProduction() == 16 && p.getStrength() > 100);
 
     }
 
