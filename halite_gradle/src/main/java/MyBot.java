@@ -1,6 +1,7 @@
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -45,43 +46,58 @@ public class MyBot {
 
             collectGameMapPieces(myID, gameMap, owns, npcs, enemies);
 
-            for (Piece own : owns) {
-                Direction pieceDirection = Direction.STILL;
-                Set<Piece> enemiesInDistance = own.getEnemiesInDistance(2, enemies);
+            try {
 
-                if (!enemiesInDistance.isEmpty()) {
-                    Piece enemy = own.findDirectionWithMostEnemies(enemiesInDistance);
-                    if ((enemy.getOwner() == 0 && enemy.getStrength() + 40 < own.getStrength())
-                            || enemy.getOwner() != 0) {
-                        pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.getLocation(), gameMap);
-                        logger.info("from: " + own + " to: " + enemy);
-                    }
-                } else if (own.hasOnlyOwnNeighbors()) {
-                    if (moveAccordingToOwnStrength(own)) {
-                        Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
-                        if (enemies.size() > 0) {
-                            pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemies.get(0).getLocation(), gameMap);
+                for (Piece own : owns) {
+                    Direction pieceDirection = Direction.STILL;
+                    Set<Piece> enemiesInDistance = own.getEnemiesInDistance(2, enemies);
+
+                    if (!enemiesInDistance.isEmpty()) {
+                        Piece enemy = own.findDirectionWithMostEnemies(enemiesInDistance);
+                        if ((enemy.getOwner() == 0 && enemy.getStrength() < own.getStrength())
+                                || enemy.getOwner() != 0) {
+                            pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.getLocation(), gameMap);
                         }
-                    }
-                } else {
-                    Piece nextPiece = findMostValuablePiece(own, gameMap, myID);
+                    } else
+                    if (own.hasOnlyOwnNeighbors()) {
+                        if (moveAccordingToOwnStrength(own)) {
 
-                    if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
-                        pieceDirection = nextPiece.getDirection();
+                            if (own.getStrength() > 180) {
+                                Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
+                                if (enemies.size() > 0) {
+                                    pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemies.get(0).getLocation(), gameMap);
+                                }
+                            } else {
+                                Piece nextPiece = findMostValuablePiece(own, gameMap, myID, true);
+
+                                if (!nextPiece.isNull()) {
+                                    pieceDirection = nextPiece.getDirection();
+                                }
+                            }
+                        }
+                    } else {
+                        Piece nextPiece = findMostValuablePiece(own, gameMap, myID, false);
+
+                        if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
+                            pieceDirection = nextPiece.getDirection();
+                        }
+
                     }
 
+                    moves.add(new Move(own.getLocation(), pieceDirection));
                 }
 
-                moves.add(new Move(own.getLocation(), pieceDirection));
+            } catch (Exception e) {
+                logger.info(e.getStackTrace().toString());
             }
-
 
             Networking.sendFrame(moves);
             frameId++;
         }
     }
 
-    private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID) {
+
+    private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID, boolean fromInside) {
 
         final int maxLookAhead = getMaxLookAhead(gameMap);
 
@@ -91,20 +107,29 @@ public class MyBot {
             dirToValue.put(dir, 0);
             Location curLoc = own.getLocation();
             int i = 0;
+            int breakAfterThese = 0;
 
-            while (i < maxLookAhead) {
+            while (i < maxLookAhead && breakAfterThese < 100) {
                 Site curSite = gameMap.getSite(curLoc, dir);
                 Integer curValue = dirToValue.get(dir);
                 curLoc = gameMap.getLocation(curLoc, dir);
-                if(curSite.owner == myID) {
+
+                if (curSite.owner == myID && !fromInside) {
                     curValue += getProductionValue(curSite.production);
-                } else {
+                } else if (!fromInside || fromInside && curSite.owner != myID) {
                     curValue += getProductionValue(curSite.production) + getStrengthValue(curSite);
                 }
+
                 dirToValue.put(dir, curValue);
 //                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
 //                        + getNpcOwnEnemyValue(curSite, myID));
-                i++;
+                if (!fromInside) {
+                    i++;
+                } else if (fromInside && curSite.owner != myID) {
+                    i++;
+                }
+
+                breakAfterThese++;
             }
         }
 
