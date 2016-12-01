@@ -21,4 +21,13 @@ public class Site {
         result = 31 * result + production;
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Site{" +
+                "owner=" + owner +
+                ", strength=" + strength +
+                ", production=" + production +
+                '}';
+    }
 }
