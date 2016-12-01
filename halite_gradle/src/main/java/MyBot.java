@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot29";
+    private static final String botName = "sveriJavaBot29_1";
 
 //    private static List<ProductionArea> productionAreas = Collections.emptyList();
 
