@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot23_1";
+    private static final String botName = "sveriJavaBot26";
 
 //    private static List<ProductionArea> productionAreas = Collections.emptyList();
 
@@ -76,7 +76,7 @@ public class MyBot {
 
     private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID) {
 
-        final int maxLookAhead = get;
+        final int maxLookAhead = getMaxLookAhead(gameMap);
 
         Map<Direction, Integer> dirToValue = new HashMap<>();
 
@@ -84,20 +84,21 @@ public class MyBot {
             dirToValue.put(dir, 0);
             Location curLoc = own.getLocation();
             int i = 0;
-//
+
             while (i < maxLookAhead) {
                 Site curSite = gameMap.getSite(curLoc, dir);
-                //                if (i == maxLookAhead - 1 && curSite.owner == myID) {
-                //                    dirToValue.remove(dir);
-                //                } else {
                 Integer curValue = dirToValue.get(dir);
                 curLoc = gameMap.getLocation(curLoc, dir);
-                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
-                        + getNpcOwnEnemyValue(curSite, myID));
-                //                }
+                if(curSite.owner == myID) {
+                    curValue += getProductionValue(curSite.production);
+                } else {
+                    curValue += getProductionValue(curSite.production) + getStrengthValue(curSite);
+                }
+                dirToValue.put(dir, curValue);
+//                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
+//                        + getNpcOwnEnemyValue(curSite, myID));
                 i++;
             }
-            //            }
         }
 
         if (dirToValue.isEmpty()) {
@@ -113,6 +114,13 @@ public class MyBot {
         }
 
         return Piece.fromLocationAndDirection(own.getLocation(), gameMap, maxEntry.getKey());
+    }
+
+    private static int getMaxLookAhead(GameMap gameMap) {
+        if (gameMap.width < 21) return 3;
+        if (gameMap.width < 31) return 4;
+        if (gameMap.width < 41) return 5;
+        return 6;
     }
 
     private static int getNpcOwnEnemyValue(Site curSite, int myID) {
