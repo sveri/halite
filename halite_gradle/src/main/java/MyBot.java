@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot26";
+    private static final String botName = "sveriJavaBot29";
 
 //    private static List<ProductionArea> productionAreas = Collections.emptyList();
 
@@ -46,49 +46,42 @@ public class MyBot {
 
             collectGameMapPieces(myID, gameMap, owns, npcs, enemies);
 
-            try {
+            for (Piece own : owns) {
+                Direction pieceDirection = Direction.STILL;
+                Set<Piece> enemiesInDistance = own.getEnemiesInDistance(2, enemies);
 
-                for (Piece own : owns) {
-                    Direction pieceDirection = Direction.STILL;
-                    Set<Piece> enemiesInDistance = own.getEnemiesInDistance(2, enemies);
+                if (!enemiesInDistance.isEmpty()) {
+                    Piece enemy = own.findDirectionWithMostEnemies(enemiesInDistance);
+                    if ((enemy.getOwner() == 0 && enemy.getStrength() < own.getStrength())
+                            || enemy.getOwner() != 0) {
+                        pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.getLocation(), gameMap);
+                    }
+                } else if (own.hasOnlyOwnNeighbors()) {
+                    if (moveAccordingToOwnStrength(own)) {
 
-                    if (!enemiesInDistance.isEmpty()) {
-                        Piece enemy = own.findDirectionWithMostEnemies(enemiesInDistance);
-                        if ((enemy.getOwner() == 0 && enemy.getStrength() < own.getStrength())
-                                || enemy.getOwner() != 0) {
-                            pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.getLocation(), gameMap);
-                        }
-                    } else
-                    if (own.hasOnlyOwnNeighbors()) {
-                        if (moveAccordingToOwnStrength(own)) {
-
-                            if (own.getStrength() > 180) {
-                                Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
-                                if (enemies.size() > 0) {
-                                    pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemies.get(0).getLocation(), gameMap);
-                                }
-                            } else {
-                                Piece nextPiece = findMostValuablePiece(own, gameMap, myID, true);
-
-                                if (!nextPiece.isNull()) {
-                                    pieceDirection = nextPiece.getDirection();
-                                }
+                        // find next enemy piece with production > 7
+                        Optional<Piece> enemy = enemies.stream().filter(piece -> piece.getProduction() > 6)
+                                .sorted(new PieceDistanceSorter(own, gameMap)).findFirst();
+                        if (enemy.isPresent() && gameMap.getDistance(own.getLocation(), enemy.get().getLocation()) < gameMap.width / 2) {
+                            pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.get().getLocation(), gameMap);
+                        } else {
+                            Piece nextPiece = findMostValuablePiece(own, gameMap, myID, true);
+//
+                            if (!nextPiece.isNull()) {
+                                pieceDirection = nextPiece.getDirection();
                             }
                         }
-                    } else {
-                        Piece nextPiece = findMostValuablePiece(own, gameMap, myID, false);
+                    }
+                } else {
+                    Piece nextPiece = findMostValuablePiece(own, gameMap, myID, false);
 
-                        if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
-                            pieceDirection = nextPiece.getDirection();
-                        }
-
+                    if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
+                        pieceDirection = nextPiece.getDirection();
                     }
 
-                    moves.add(new Move(own.getLocation(), pieceDirection));
                 }
 
-            } catch (Exception e) {
-                logger.info(e.getStackTrace().toString());
+                moves.add(new Move(own.getLocation(), pieceDirection));
             }
 
             Networking.sendFrame(moves);
