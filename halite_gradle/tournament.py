@@ -16,7 +16,7 @@ def update_results(results_map, result):
     results_map[result] = count + 1
 
 def run_halite_game():
-    for i in range(6):
+    for i in range(10):
         range_str = random.choice(map_sizes)
         print("selecting size: " + range_str)
         stream = os.popen("halite -q -d " + range_str +  " \"java -jar build/libs/MyBot.jar\" \"java -jar MyBot22.jar\" \"java -jar MyBot25.jar\"")
