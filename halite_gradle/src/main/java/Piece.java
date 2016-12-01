@@ -57,6 +57,41 @@ public class Piece {
         return neighbors;
     }
 
+    Set<Piece> getEnemiesInDistance(int maxDistance, List<Piece> enemies) {
+        Set<Piece> enemiesInDistance = new HashSet<>();
+
+        for (Piece enemy : enemies) {
+            if (gameMap.getDistance(getLocation(), enemy.getLocation()) <= maxDistance) {
+                enemiesInDistance.add(enemy);
+            }
+        }
+
+        return enemiesInDistance;
+    }
+
+    Piece findDirectionWithMostEnemies(Set<Piece> enemiesInDistance) {
+        Map<Direction, Integer> dirToValue = new HashMap<>();
+        for (Direction dir : Direction.CARDINALS) {
+            dirToValue.put(dir, 0);
+        }
+
+        for (Piece enemy : enemiesInDistance) {
+            Direction dirToEnemy = Direction.getDirectionFromToGameMap(getLocation(), enemy.getLocation(), gameMap);
+            Integer enemyCount = dirToValue.get(dirToEnemy) + 1;
+            dirToValue.put(dirToEnemy, enemyCount);
+        }
+
+        Map.Entry<Direction, Integer> maxEntry = null;
+
+        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
+            if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
+                maxEntry = entry;
+            }
+        }
+
+        return Piece.fromLocationAndDirection(getLocation(), gameMap, maxEntry.getKey());
+    }
+
     public boolean hasEnemyNeighbor(int myID) {
         for (Direction direction : Direction.CARDINALS) {
             if (gameMap.getSite(this.loc, direction).owner != 0 && gameMap.getSite(this.loc, direction).owner != myID) {

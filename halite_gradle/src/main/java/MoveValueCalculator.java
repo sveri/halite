@@ -33,7 +33,6 @@ public class MoveValueCalculator {
         }
 
         MoveFromTo moveFromTo = possibleMoves.stream().max(new MoveValueComparator()).get();
-        MyBot.logger.info(moveFromTo.toString());
 
         return Piece.fromLocationAndDirection(own.getLocation(), gameMap, moveFromTo.getNextDirection());
     }

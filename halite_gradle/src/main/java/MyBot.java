@@ -47,9 +47,16 @@ public class MyBot {
 
             for (Piece own : owns) {
                 Direction pieceDirection = Direction.STILL;
+                Set<Piece> enemiesInDistance = own.getEnemiesInDistance(2, enemies);
 
-                if (own.hasOnlyOwnNeighbors()) {
-                    logger.info("own neighbors");
+                if (!enemiesInDistance.isEmpty()) {
+                    Piece enemy = own.findDirectionWithMostEnemies(enemiesInDistance);
+                    if ((enemy.getOwner() == 0 && enemy.getStrength() + 40 < own.getStrength())
+                            || enemy.getOwner() != 0) {
+                        pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.getLocation(), gameMap);
+                        logger.info("from: " + own + " to: " + enemy);
+                    }
+                } else if (own.hasOnlyOwnNeighbors()) {
                     if (moveAccordingToOwnStrength(own)) {
                         Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
                         if (enemies.size() > 0) {
