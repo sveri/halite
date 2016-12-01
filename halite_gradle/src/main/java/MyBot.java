@@ -8,7 +8,7 @@ import java.util.*;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot25";
+    private static final String botName = "sveriJavaBot26";
 
     static final Logger logger = new Logger(botName);
 
@@ -42,11 +42,12 @@ public class MyBot {
             for (Piece own : owns) {
                 Direction pieceDirection = Direction.STILL;
 
-                if (own.hasEnemyNeighbor(myID)) {
-                    Piece mostEnemies = own.findPieceWithMostEnemyNeighbors(myID);
-                    pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), mostEnemies.getLocation(), gameMap);
-
-                } else if (own.hasOnlyOwnNeighbors()) {
+//                if (own.hasEnemyNeighbor(myID)) {
+//                    Piece mostEnemies = own.findPieceWithMostEnemyNeighbors(myID);
+//                    pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), mostEnemies.getLocation(), gameMap);
+//
+//                } else
+                if (own.hasOnlyOwnNeighbors()) {
                     logger.info("own neighbors");
                     if (moveAccordingToOwnStrength(own)) {
                         Collections.sort(enemies, new PieceDistanceSorter(own, gameMap));
@@ -74,22 +75,31 @@ public class MyBot {
 
     private static Piece findMostValuablePiece(Piece own, GameMap gameMap, int myID) {
 
-        final int maxLookAhead = 4;
+        final int maxLookAhead = getMaxLookAhead(gameMap);
 
-        Map<Direction, Integer> dirToValue = new HashMap<>();
+        Map<Direction, Double> dirToValue = new HashMap<>();
 
         for (Direction dir : Direction.CARDINALS) {
-            long endTime = System.nanoTime() + 100000000;
-            dirToValue.put(dir, 0);
+//            long endTime = System.nanoTime() + 100000000;
+            dirToValue.put(dir, 0.);
             Location curLoc = own.getLocation();
             int i = 0;
 
-            while (System.nanoTime() < endTime && i < maxLookAhead) {
+            while (i < maxLookAhead) {
                 Site curSite = gameMap.getSite(curLoc, dir);
-                Integer curValue = dirToValue.get(dir);
+                Double curValue = dirToValue.get(dir);
                 curLoc = gameMap.getLocation(curLoc, dir);
-                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
-                        + getNpcOwnEnemyValue(curSite, myID));
+//                curValue += getProductionValue(curSite.production) + getStrengthValue(curSite);
+                if (curSite.owner != myID) {
+//                    curValue += curSite.production  / getStrengthValue(curSite);
+                    curValue += getProductionValue(curSite.production) + getStrengthValue(curSite);
+                }
+//                if(i == maxLookAhead - 1 && curSite.owner == myID) {
+//                    curValue -= 40;
+//                }
+                dirToValue.put(dir, curValue);
+//                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
+//                        + getNpcOwnEnemyValue(curSite, myID));
                 i++;
             }
         }
@@ -98,9 +108,9 @@ public class MyBot {
             return NullPiece.newNullPiece();
         }
 
-        Map.Entry<Direction, Integer> maxEntry = null;
+        Map.Entry<Direction, Double> maxEntry = null;
 
-        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
+        for (Map.Entry<Direction, Double> entry : dirToValue.entrySet()) {
             if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
                 maxEntry = entry;
             }
@@ -109,20 +119,29 @@ public class MyBot {
         return Piece.fromLocationAndDirection(own.getLocation(), gameMap, maxEntry.getKey());
     }
 
+    private static int getMaxLookAhead(GameMap gameMap) {
+        if (gameMap.width < 21) return 3;
+        if (gameMap.width < 31) return 4;
+        if (gameMap.width < 41) return 5;
+        return 6;
+    }
+
     private static int getNpcOwnEnemyValue(Site curSite, int myID) {
         if (curSite.owner == myID) return 0;
 
         return 10;
     }
 
-    private static int getStrengthValue(Site curSite) {
-        if (curSite.strength > 240) return 0;
-        if (curSite.strength > 210) return 1;
-        if (curSite.strength > 190) return 2;
-        if (curSite.strength > 170) return 3;
-        if (curSite.strength > 150) return 4;
-        if (curSite.strength > 130) return 5;
-        if (curSite.strength > 110) return 6;
+    private static double getStrengthValue(Site curSite) {
+//        if(curSite.strength == 0) return 1;
+//        return curSite.strength;
+        if (curSite.strength > 240) return 1;
+        if (curSite.strength > 210) return 2;
+        if (curSite.strength > 190) return 3;
+        if (curSite.strength > 170) return 4;
+        if (curSite.strength > 150) return 5;
+        if (curSite.strength > 130) return 6;
+        if (curSite.strength > 110) return 7;
         if (curSite.strength > 90) return 7;
         if (curSite.strength > 70) return 8;
         if (curSite.strength > 60) return 9;
@@ -136,6 +155,9 @@ public class MyBot {
     }
 
     private static int getProductionValue(int production) {
+
+        if (production < 1) return 0;
+        if (production < 2) return 1;
         if (production < 3) return 2;
         if (production < 5) return 4;
         if (production < 7) return 6;
