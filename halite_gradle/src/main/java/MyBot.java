@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot29_1";
+    private static final String botName = "sveriJavaBot30";
 
 //    private static List<ProductionArea> productionAreas = Collections.emptyList();
 
@@ -59,7 +59,6 @@ public class MyBot {
                 } else if (own.hasOnlyOwnNeighbors()) {
                     if (moveAccordingToOwnStrength(own)) {
 
-                        // find next enemy piece with production > 7
                         Optional<Piece> enemy = enemies.stream().filter(piece -> piece.getProduction() > 6)
                                 .sorted(new PieceDistanceSorter(own, gameMap)).findFirst();
                         if (enemy.isPresent() && gameMap.getDistance(own.getLocation(), enemy.get().getLocation()) < gameMap.width / 2) {
@@ -94,28 +93,25 @@ public class MyBot {
 
         final int maxLookAhead = getMaxLookAhead(gameMap);
 
-        Map<Direction, Integer> dirToValue = new HashMap<>();
+        Map<Direction, Double> dirToValue = new HashMap<>();
 
         for (Direction dir : Direction.CARDINALS) {
-            dirToValue.put(dir, 0);
+            dirToValue.put(dir, 0.);
             Location curLoc = own.getLocation();
             int i = 0;
             int breakAfterThese = 0;
 
             while (i < maxLookAhead && breakAfterThese < 100) {
                 Site curSite = gameMap.getSite(curLoc, dir);
-                Integer curValue = dirToValue.get(dir);
+                Double curValue = dirToValue.get(dir);
                 curLoc = gameMap.getLocation(curLoc, dir);
 
-                if (curSite.owner == myID && !fromInside) {
-                    curValue += getProductionValue(curSite.production);
-                } else if (!fromInside || fromInside && curSite.owner != myID) {
-                    curValue += getProductionValue(curSite.production) + getStrengthValue(curSite);
+                if (curSite.owner != myID) {
+                    curValue += curSite.production / getStrengthValue(curSite);
                 }
 
                 dirToValue.put(dir, curValue);
-//                dirToValue.put(dir, curValue + getProductionValue(curSite.production) + getStrengthValue(curSite)
-//                        + getNpcOwnEnemyValue(curSite, myID));
+
                 if (!fromInside) {
                     i++;
                 } else if (fromInside && curSite.owner != myID) {
@@ -130,9 +126,9 @@ public class MyBot {
             return NullPiece.newNullPiece();
         }
 
-        Map.Entry<Direction, Integer> maxEntry = null;
+        Map.Entry<Direction, Double> maxEntry = null;
 
-        for (Map.Entry<Direction, Integer> entry : dirToValue.entrySet()) {
+        for (Map.Entry<Direction, Double> entry : dirToValue.entrySet()) {
             if (maxEntry == null || entry.getValue() > maxEntry.getValue()) {
                 maxEntry = entry;
             }
@@ -148,41 +144,9 @@ public class MyBot {
         return 6;
     }
 
-    private static int getNpcOwnEnemyValue(Site curSite, int myID) {
-        if (curSite.owner == myID) return 0;
-
-        return 10;
-    }
-
-    private static int getStrengthValue(Site curSite) {
-        if (curSite.strength > 240) return 0;
-        if (curSite.strength > 210) return 1;
-        if (curSite.strength > 190) return 2;
-        if (curSite.strength > 170) return 3;
-        if (curSite.strength > 150) return 4;
-        if (curSite.strength > 130) return 5;
-        if (curSite.strength > 110) return 6;
-        if (curSite.strength > 90) return 7;
-        if (curSite.strength > 70) return 8;
-        if (curSite.strength > 60) return 9;
-        if (curSite.strength > 50) return 10;
-        if (curSite.strength > 40) return 11;
-        if (curSite.strength > 30) return 12;
-        if (curSite.strength > 20) return 13;
-        if (curSite.strength > 10) return 13;
-
-        return 15;
-    }
-
-    private static int getProductionValue(int production) {
-        if (production < 3) return 2;
-        if (production < 5) return 4;
-        if (production < 7) return 6;
-        if (production < 9) return 8;
-        if (production < 11) return 10;
-        if (production < 13) return 12;
-        if (production < 15) return 14;
-        return 16;
+    private static double getStrengthValue(Site curSite) {
+        if(curSite.strength == 0) return 1.;
+        return curSite.strength;
     }
 
 // convolutional neural network
