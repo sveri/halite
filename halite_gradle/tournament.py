@@ -21,7 +21,7 @@ def run_halite_game():
     for i in range(20):
         range_str = random.choice(map_sizes)
         print("selecting size: " + range_str)
-        stream = os.popen("halite -q -d " + range_str +  " \"java -jar build/libs/MyBot.jar\" \"java -jar MyBot25.jar\" \"java -jar MyBot29.jar\"")
+        stream = os.popen("halite -q -d " + range_str +  " \"java -jar build/libs/MyBot.jar\" \"java -jar MyBot29.jar\" \"java -jar MyBot30.jar\"")
 
         bash_results = stream.read()
         bash_results = bash_results[-16:]

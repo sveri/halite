@@ -10,7 +10,10 @@ public class Piece {
     private final int owner;
     private final Direction direction;
     private final Site site;
-//    private List<Piece> ownNeighbors;
+
+    private boolean isAtBorder = false;
+
+    private boolean isInside = false;
 
     protected Piece(int owner) {
         this.owner = owner;
@@ -26,19 +29,21 @@ public class Piece {
         this.owner = id;
         this.direction = direction;
         this.site = gameMap.getSite(loc);
+        if(hasOnlyOwnNeighbors()) this.isInside = true;
+        this.isAtBorder = !this.isInside;
     }
 
-    public static Piece fromLocation(Location loc, GameMap gameMap, int id) {
+    static Piece fromLocation(Location loc, GameMap gameMap, int id) {
         return new Piece(loc, gameMap, id, null);
     }
 
-    public static Piece fromLocationAndDirection(Location loc, GameMap gameMap, Direction direction) {
+    static Piece fromLocationAndDirection(Location loc, GameMap gameMap, Direction direction) {
         Location newLocation = gameMap.getLocation(loc, direction);
         Site newSite = gameMap.getSite(newLocation);
         return new Piece(newLocation, gameMap, newSite.owner, direction);
     }
 
-    public boolean hasOnlyOwnNeighbors() {
+    private boolean hasOnlyOwnNeighbors() {
         for (Direction direction : Direction.CARDINALS) {
             if (gameMap.getSite(this.loc, direction).owner != owner) {
                 return false;
@@ -250,5 +255,13 @@ public class Piece {
         int result = loc.hashCode();
         result = 31 * result + owner;
         return result;
+    }
+
+    public boolean isAtBorder() {
+        return isAtBorder;
+    }
+
+    public boolean isInside() {
+        return isInside;
     }
 }

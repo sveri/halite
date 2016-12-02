@@ -10,12 +10,7 @@ import java.util.stream.Stream;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot30";
-
-//    private static List<ProductionArea> productionAreas = Collections.emptyList();
-
-//    private static final Map<Location, Location> movedFromTo = new HashMap<>();
-//    private static final Map<Location, Location> movedToFrom = new HashMap<>();
+    private static final String botName = "sveriJavaBot31";
 
     static final Logger logger = new Logger(botName);
 
@@ -56,12 +51,12 @@ public class MyBot {
                             || enemy.getOwner() != 0) {
                         pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.getLocation(), gameMap);
                     }
-                } else if (own.hasOnlyOwnNeighbors()) {
+                } else if (own.isInside()) {
                     if (moveAccordingToOwnStrength(own)) {
 
                         Optional<Piece> enemy = enemies.stream().filter(piece -> piece.getProduction() > 6)
                                 .sorted(new PieceDistanceSorter(own, gameMap)).findFirst();
-                        if (enemy.isPresent() && gameMap.getDistance(own.getLocation(), enemy.get().getLocation()) < gameMap.width / 2) {
+                        if (enemy.isPresent() && gameMap.getDistance(own.getLocation(), enemy.get().getLocation()) < gameMap.width / 4) {
                             pieceDirection = Direction.getDirectionFromToGameMap(own.getLocation(), enemy.get().getLocation(), gameMap);
                         } else {
                             Piece nextPiece = findMostValuablePiece(own, gameMap, myID, true);
@@ -175,22 +170,22 @@ public class MyBot {
 
     private static boolean moveAccordingToOwnStrength(Piece p) {
         return (p.getProduction() == 0
-                || p.getProduction() == 1 && p.getStrength() > 2)
-                || (p.getProduction() == 2 && p.getStrength() > 5)
-                || (p.getProduction() == 3 && p.getStrength() > 10)
-                || (p.getProduction() == 4 && p.getStrength() > 15)
-                || (p.getProduction() == 5 && p.getStrength() > 20)
-                || (p.getProduction() == 6 && p.getStrength() > 25)
-                || (p.getProduction() == 7 && p.getStrength() > 30)
-                || (p.getProduction() == 8 && p.getStrength() > 35)
-                || (p.getProduction() == 9 && p.getStrength() > 40)
-                || (p.getProduction() == 10 && p.getStrength() > 45)
-                || (p.getProduction() == 11 && p.getStrength() > 50)
+                || p.getProduction() == 1 && p.getStrength() > 5)
+                || (p.getProduction() == 2 && p.getStrength() > 10)
+                || (p.getProduction() == 3 && p.getStrength() > 15)
+                || (p.getProduction() == 4 && p.getStrength() > 20)
+                || (p.getProduction() == 5 && p.getStrength() > 25)
+                || (p.getProduction() == 6 && p.getStrength() > 30)
+                || (p.getProduction() == 7 && p.getStrength() > 35)
+                || (p.getProduction() == 8 && p.getStrength() > 40)
+                || (p.getProduction() == 9 && p.getStrength() > 45)
+                || (p.getProduction() == 10 && p.getStrength() > 50)
+                || (p.getProduction() == 11 && p.getStrength() > 55)
                 || (p.getProduction() == 12 && p.getStrength() > 60)
-                || (p.getProduction() == 13 && p.getStrength() > 70)
-                || (p.getProduction() == 14 && p.getStrength() > 80)
-                || (p.getProduction() == 15 && p.getStrength() > 90)
-                || (p.getProduction() == 16 && p.getStrength() > 100);
+                || (p.getProduction() == 13 && p.getStrength() > 65)
+                || (p.getProduction() == 14 && p.getStrength() > 70)
+                || (p.getProduction() == 15 && p.getStrength() > 75)
+                || (p.getProduction() == 16 && p.getStrength() > 80);
 
     }
 
