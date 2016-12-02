@@ -10,7 +10,7 @@ import java.util.stream.Stream;
  */
 public class MyBot {
 
-    private static final String botName = "sveriJavaBot31";
+    private static final String botName = "sveriJavaBot33";
 
     static final Logger logger = new Logger(botName);
 
@@ -69,7 +69,9 @@ public class MyBot {
                 } else {
                     Piece nextPiece = findMostValuablePiece(own, gameMap, myID, false);
 
-                    if (!nextPiece.isNull() && nextPiece.getStrength() < own.getStrength()) {
+                    if (!nextPiece.isNull()
+                            && (nextPiece.getStrength() < own.getStrength() && nextPiece.getOwner() != myID)
+                                || nextPiece.getOwner() == myID && moveAccordingToOwnStrength(own)) {
                         pieceDirection = nextPiece.getDirection();
                     }
 

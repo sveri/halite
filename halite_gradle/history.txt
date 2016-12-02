@@ -1,3 +1,5 @@
+sveri v30	78 of 830	109
+sveri v29	123 of 830	125
 sveri v28	174 of 826	92 (was same as v22)
 sveri v27	134 of 825	55
 sveri v26	122 of 825	197
